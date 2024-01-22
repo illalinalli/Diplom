@@ -1,0 +1,224 @@
+﻿@using HomelessAnimalsDiplom.Views.Shared.Components;
+@using HomelessAnimalsDiplom.Models;
+@using Microsoft.AspNetCore.Components.Rendering;
+@using System.Globalization;
+@using HomelessAnimalsDiplom.Controllers;
+@using static HomelessAnimalsDiplom.Models.Database;
+@using static HomelessAnimalsDiplom.Views.Advertisement.AdvertisementSettings;
+@using static HomelessAnimalsDiplom.Views.Shared.Components.SearchComponent;
+@using static HomelessAnimalsDiplom.Controllers.HomeController;
+@using MongoDB.Bson;
+@using MongoDB.Driver;
+@using System.Web;
+@code {
+    public SearchComponent? Search;
+    public static List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList().FindAll(x => x.UserRef != CurUser.Id);
+    List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
+    public static List<Item> res;
+
+    void AnimalTypeChanged(ObjectId id)
+    {
+        animalType = AnimalTypeCollection.Find(x => x.Id == id).FirstOrDefault();
+
+        if (animalType.Id != ObjectId.Empty)
+        {
+            breeds = BreedCollection
+             .Find(x => x.AnimalTypeRef == animalType.Id)
+             .ToList();
+        }
+
+        selectedTypeValue = animalType.Name;
+        selectedBreedValue = "Порода";
+        selectedColorValue = "Окрас";
+        breed = new();
+        propertyValue = new();
+        StateHasChanged();
+    }
+
+    void BreedChanged(ObjectId id)
+    {
+        breed = BreedCollection.Find(x => x.Id == id).FirstOrDefault();
+        selectedBreedValue = breed.Name;
+        selectedColorValue = "Окрас";
+        propertyValue = new();
+        StateHasChanged();
+    }
+
+    void ColorChanged(ObjectId id)
+    {
+        propertyValue.Id = id;
+        selectedColorValue = propertyValues.FirstOrDefault(x => x.Id == id).Name;
+        StateHasChanged();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        FindAds();
+    }
+
+    public static void FindAds()
+    {
+        res = new();
+        bool colorIsEmpty; // false
+        bool typeIsEmpty;
+        bool breedIsEmpty;
+        if (propertyValue.Id == ObjectId.Empty)
+        {
+            colorIsEmpty = true;
+        }
+        else
+        {
+            colorIsEmpty = false;
+        }
+
+        if (animalType.Id == ObjectId.Empty)
+        {
+            typeIsEmpty = true;
+        }
+        else
+        {
+            typeIsEmpty = false;
+        }
+
+        if (breed.Id == ObjectId.Empty)
+        {
+            breedIsEmpty = true;
+        }
+        else
+        {
+            breedIsEmpty = false;
+        }
+
+        // всё пустое - ищем все публикации
+        if (breedIsEmpty && typeIsEmpty && colorIsEmpty)
+        {
+            res = Items;
+        }
+        // добавить ещё в условия пользователя curUser != x.UserRef
+        if (!typeIsEmpty && breedIsEmpty && colorIsEmpty)
+        {
+            // только по типу
+            res = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id);
+
+        }
+
+        if (!typeIsEmpty && !breedIsEmpty && colorIsEmpty)
+        {
+            res = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
+            && x.BreedRef == breed.Id);
+        }
+
+        if (!typeIsEmpty && !breedIsEmpty && !colorIsEmpty)
+        {
+            res = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
+            && x.BreedRef == breed.Id && x.Properties.Contains(propertyValue.Id));
+        }
+
+        if (!typeIsEmpty && breedIsEmpty && !colorIsEmpty)
+        {
+            res = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
+            && x.Properties.Contains(propertyValue.Id));
+        }
+    }
+}
+
+<div class="container mt-3 pt-3 mb-5" style="font-size: medium;">
+    <div class="col">
+        <div class="row mb-4" style="font-weight:600;">Поиск объявлений</div>
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-8 col-md-10">
+                <form class="d-flex flex-column flex-md-row align-items-center">
+                    <div class="col-md-4 mb-3">
+                        <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            @selectedTypeValue
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var aType in animalTypes)
+                            {
+                                <li class="dropdown-item" value="@aType.Id" style="font-size: small; width: 150px;" @onclick="@(e => AnimalTypeChanged(aType.Id))">@aType.Name</li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            @selectedBreedValue
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var b in breeds)
+                            {
+                                <li class="dropdown-item" value="@b.Id" style="font-size: small; width: 150px;" @onclick="@(e => BreedChanged(@b.Id))">@b.Name</li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            @selectedColorValue
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var c in propertyValues.FindAll(x => x.PropTypeRef == new ObjectId("658ab0a38a4dcfd166a80346")).OrderBy(x => x.Name))
+                            {
+                            // href="/Search/SearchView"
+                                <li class="dropdown-item" value="@c.Id" style="font-size: small; width: 150px;" @onclick="@(e => ColorChanged(@c.Id))">@c.Name</li>
+                            }
+                        </ul>
+                    </div>
+                </form>
+                <div class="row justify-content-center">
+                    <a class="btn btn-dark" style="font-size: small; min-width: 200px; color: white; border-color: #d90429; background-color: #d90429;" @onclick="FindAds">Поиск</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col" style="font-weight:600; font-size: medium;">Результат поиска</div>
+    </div>
+    <div class="row">
+        <div class="col">
+            @if (res.Count != 0)
+            {
+                // выводим публикации
+                foreach (var item in res)
+                {
+                    <div class="col-lg-3 col-md-5 col-sm-6 col-12 pt-3 pb-5">
+                        <div class="card" style="width: 24rem;">
+                            @if (item.Images?.Count != 0)
+                            {
+                                <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        @foreach (var img in item.Images)
+                                        {
+                                            <div class="carousel-item @((item.Images.IndexOf(img) == 0).StrIf("active"))" data-bs-interval="5000">
+                                                <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(img)}")" alt="Image" class="d-block w-100 card-img">
+                                            </div>
+                                        }
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Предыдущий</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Следующий</span>
+                                    </button>
+                                </div>
+                            }
+
+                            <div class="card-body">
+                                <h5 class="card-title">@item.Title</h5>
+                              @*  <p class="card-text">@item.LongDescription</p>*@
+                                <div class="card-button-container">
+                                    <a href="#" style="font-size: medium;" class="btn btn-primary">Подробнее...</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <h5 style="color: gray;">Ничего не найдено</h5>
+            }
+        </div>
+    </div>
+</div>

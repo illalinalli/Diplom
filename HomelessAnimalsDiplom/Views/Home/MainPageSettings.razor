@@ -1,0 +1,70 @@
+﻿@using HomelessAnimalsDiplom.Models;
+@using HomelessAnimalsDiplom.Views.Shared.Components;
+@using Microsoft.AspNetCore.Components.Rendering;
+@using System.Globalization;
+@using HomelessAnimalsDiplom.Controllers;
+@using static HomelessAnimalsDiplom.Models.Database;
+@using static HomelessAnimalsDiplom.Views.Advertisement.AdvertisementSettings;
+@using MongoDB.Bson;
+@using MongoDB.Driver;
+@code {
+    public List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList();
+    List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
+    public SearchComponent? Search;
+}
+
+<SearchComponent @ref="Search" />
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col" style="font-weight:600; font-size: medium;">Рекомендации для вас</div>
+    </div>
+    <div class="row">
+        <div class="col">
+            @if (Items.Count != 0)
+            {
+                foreach (var item in Items)
+                {
+                    <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
+                        <div class="card" style="width: 24rem;">
+                            @if (item.Images?.Count != 0)
+                            {
+                                <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        @foreach (var img in item.Images)
+                                        {
+                                            <div class="carousel-item @((item.Images.IndexOf(img) == 0).StrIf("active"))" data-bs-interval="5000">
+                                                <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(img)}")" alt="Image" class="d-block w-100 card-img">
+                                            </div>
+                                        }
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Предыдущий</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Следующий</span>
+                                    </button>
+                                </div>
+                            }
+
+                            <div class="card-body">
+                                <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
+                                @*<p class="card-text">@item.LongDescription</p>*@
+                                <div class="card-button-container">
+                                    <a href="#" class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;">Подробнее...</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <h5 style="color: gray;">Предложений пока нет</h5>
+            }
+        </div>
+    </div>
+</div>
+

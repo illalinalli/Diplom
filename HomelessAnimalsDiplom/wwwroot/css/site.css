@@ -1,0 +1,56 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+enterPicture {
+    z-index: -1;
+}
+
+.enterPic img {
+    max-width: 100%;
+}
+
+.card-img {
+    height: 200px; /* установите желаемую высоту */
+    object-fit: cover; /* чтобы изображени€ автоматически масштабировались и сохран€ли пропорции */
+}
+
+.card {
+    height: 360px; /* «адайте фиксированную высоту дл€ карточек */
+    overflow: hidden; /* —крыть излишний текст */
+}
+
+.card-text {
+    height: 66px; /* «адайте фиксированную высоту дл€ текста */
+    overflow: hidden; /* —крыть излишний текст */
+    text-overflow: ellipsis; /* ƒобавить многоточие в конце обрезанного текста */
+    font-size: 15px;
+}
+.card-title {
+    font-weight: bold;
+    text-align: center;
+    font-size: medium;
+}
+.card-button-container {
+    display: flex;
+    justify-content: center;
+    padding: 0px 10px 0 10px;
+}
+.p {
+    margin: 0px 0px 0px;
+}
