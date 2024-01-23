@@ -12,7 +12,6 @@
 @using System.Web;
 @code {
     public SearchComponent? Search;
-    public static List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList().FindAll(x => x.UserRef != CurUser.Id);
     List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
     public static List<Item> res;
 
@@ -52,11 +51,12 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        FindAds();
+        FindItems();
     }
 
-    public static void FindAds()
+    public static void FindItems()
     {
+        List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList().FindAll(x => x.UserRef != CurUser.Id);
         res = new();
         bool colorIsEmpty; // false
         bool typeIsEmpty;
@@ -119,6 +119,11 @@
             && x.Properties.Contains(propertyValue.Id));
         }
     }
+
+    public void GetItem(Item item)
+    {
+        
+    }
 }
 
 <div class="container mt-3 pt-3 mb-5" style="font-size: medium;">
@@ -163,7 +168,7 @@
                     </div>
                 </form>
                 <div class="row justify-content-center">
-                    <a class="btn btn-dark" style="font-size: small; min-width: 200px; color: white; border-color: #d90429; background-color: #d90429;" @onclick="FindAds">Поиск</a>
+                    <a class="btn btn-dark" style="font-size: small; min-width: 200px; color: white; border-color: #d90429; background-color: #d90429;" @onclick="FindItems">Поиск</a>
                 </div>
             </div>
         </div>
@@ -205,10 +210,10 @@
                             }
 
                             <div class="card-body">
-                                <h5 class="card-title">@item.Title</h5>
+                                <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
                               @*  <p class="card-text">@item.LongDescription</p>*@
                                 <div class="card-button-container">
-                                    <a href="#" style="font-size: medium;" class="btn btn-primary">Подробнее...</a>
+                                    <a href="Advertisement/AdvertisementDetailView" class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="() => GetItem(item)">Подробнее...</a>
                                 </div>
                             </div>
                         </div>

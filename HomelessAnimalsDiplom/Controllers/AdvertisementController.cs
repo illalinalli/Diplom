@@ -9,5 +9,11 @@ namespace HomelessAnimalsDiplom.Controllers
         {
             return View("AdvertisementView", CurUser);
         }
+
+        // подробные описания публикации
+        public IActionResult AdvertisementDetailView()
+        {
+            return View("AdvertisementDetailView");
+        }
     }
 }

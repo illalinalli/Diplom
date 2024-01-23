@@ -77,10 +77,54 @@ namespace HomelessAnimalsDiplom.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        public IActionResult SignUp()
+        { 
+            return View("SignUp");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SignUp(string Name, string Login, string Password)
+        {
+            if (ModelState.IsValid && Login != null && Name != null && Password != null)
+            {
+                var httpContext = HttpContext;
+                var hash = GetHash(Password);
+
+                User user = new()
+                {
+                    Id = ObjectId.GenerateNewId(),
+                    Name = Name,
+                    Login = Login,
+                    Password = hash
+                };
+                // добавляем пользователя в БД
+                var filter = Builders<User>.Filter.Eq("_id", user.Id);
+
+                // выполнение операции upsert
+                UserCollection?.ReplaceOneAsync(filter, user, ReplaceOptionsUpsert);
+
+                CurUser = user;
+
+                var claims = new List<Claim>() { new Claim(ClaimTypes.Name, user.Login) };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                AuthenticationProperties authProps = new()
+                {
+                    IsPersistent = true
+                };
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProps);
+                return RedirectToAction("MainPage", "Home");
+            }
+            return View();
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            CurUser = new();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return Redirect("Login");
+        }
+        
     }
 }
