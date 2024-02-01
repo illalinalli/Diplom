@@ -1,4 +1,5 @@
 ﻿@using HomelessAnimalsDiplom.Models;
+@using HomelessAnimalsDiplom.Views.Advertisement;
 @using HomelessAnimalsDiplom.Views.Shared.Components;
 @using Microsoft.AspNetCore.Components.Rendering;
 @using System.Globalization;
@@ -11,10 +12,18 @@
     public List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList();
     List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
     public SearchComponent? Search;
+    public AdvertisementDetailComponent AdvertisementDetail;
+   // public static bool isShown;
+    public void ShowDetails()
+    {
+        
+        //AdvertisementDetail.isDialogVisible = true;
+        AdvertisementDetail.ShowDialog(null, null);
+        //StateHasChanged();
+    }
 }
 
 <SearchComponent @ref="Search" />
-
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col" style="font-weight:600; font-size: medium;">Рекомендации для вас</div>
@@ -53,7 +62,7 @@
                                 <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
                                 @*<p class="card-text">@item.LongDescription</p>*@
                                 <div class="card-button-container">
-                                    <a href="#" class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;">Подробнее...</a>
+                                    <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="ShowDetails">Подробнее...</button>
                                 </div>
                             </div>
                         </div>
@@ -68,3 +77,4 @@
     </div>
 </div>
 
+<AdvertisementDetailComponent @ref="AdvertisementDetail" />

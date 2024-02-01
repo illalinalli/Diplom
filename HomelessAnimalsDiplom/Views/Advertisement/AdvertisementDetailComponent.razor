@@ -1,0 +1,47 @@
+﻿@code {
+    //public class DialogModel
+    //{
+    //    public string Caption;
+    //    public Action OnOk;
+    //    public Action OnClose;
+    //}
+
+    bool Shown;
+    Action OnYes;
+    Action OnClose;
+
+    public void ShowDialog(Action onYes = null, Action onClose = null)
+    {
+        OnYes = onYes;
+        Shown = true;
+        StateHasChanged();
+        //isDialogVisible = true;
+    }
+
+    void Close()
+    {
+        OnClose?.Invoke();
+        Shown = false;
+        StateHasChanged();
+    }
+}
+
+@if (Shown)
+{
+    <div class="modal" tabindex="-1" style="display: block; background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Диалоговое окно</h5>
+                    <button type="button" class="btn-close" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Здесь содержимое вашего диалогового окна...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="Close">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
