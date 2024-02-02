@@ -13,13 +13,9 @@
     List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
     public SearchComponent? Search;
     public AdvertisementDetailComponent AdvertisementDetail;
-   // public static bool isShown;
-    public void ShowDetails()
+    public void ShowDetails(Item item)
     {
-        
-        //AdvertisementDetail.isDialogVisible = true;
-        AdvertisementDetail.ShowDialog(null, null);
-        //StateHasChanged();
+        AdvertisementDetail.ShowDialog(item, null, null);
     }
 }
 
@@ -60,9 +56,8 @@
 
                             <div class="card-body">
                                 <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
-                                @*<p class="card-text">@item.LongDescription</p>*@
                                 <div class="card-button-container">
-                                    <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="ShowDetails">Подробнее...</button>
+                                    <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="()=>ShowDetails(item)">Подробнее...</button>
                                 </div>
                             </div>
                         </div>
@@ -75,6 +70,6 @@
             }
         </div>
     </div>
+    <AdvertisementDetailComponent @ref="AdvertisementDetail" />
 </div>
 
-<AdvertisementDetailComponent @ref="AdvertisementDetail" />

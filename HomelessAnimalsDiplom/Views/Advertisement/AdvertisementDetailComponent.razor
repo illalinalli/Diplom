@@ -1,21 +1,27 @@
-﻿@code {
-    //public class DialogModel
-    //{
-    //    public string Caption;
-    //    public Action OnOk;
-    //    public Action OnClose;
-    //}
+﻿@using HomelessAnimalsDiplom.Models;
+@using static HomelessAnimalsDiplom.Models.Database;
+@using MongoDB.Bson;
+@using MongoDB.Driver;
+@using static HomelessAnimalsDiplom.Views.Advertisement.AdvertisementSettings;
+@code {
 
     bool Shown;
     Action OnYes;
     Action OnClose;
-
-    public void ShowDialog(Action onYes = null, Action onClose = null)
+    Item selectedItem;
+    List<PropertyValue> properties;
+    public void ShowDialog(Item item, Action onYes = null, Action onClose = null)
     {
         OnYes = onYes;
         Shown = true;
+        selectedItem = item;
+        properties = new();
+        foreach (var p in item.Properties)
+        {
+            properties.Add(propertyValues.FirstOrDefault(x => x.Id == p));
+        }
+
         StateHasChanged();
-        //isDialogVisible = true;
     }
 
     void Close()
@@ -32,14 +38,32 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Диалоговое окно</h5>
+                    <h5 class="modal-title">Подробности о животном</h5>
                     <button type="button" class="btn-close" @onclick="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Здесь содержимое вашего диалогового окна...</p>
+                    @if (selectedItem != null)
+                    {
+                        <h4>@selectedItem.Title</h4>
+                        <h5>@selectedItem.LongDescription</h5>
+                        <h5>Порода: @BreedCollection.Find(x => x.Id == selectedItem.BreedRef).FirstOrDefault().Name</h5>
+                        @if (properties != null)
+                        {
+                            <h5>Пол: @properties.FirstOrDefault(x => x.PropTypeRef == new ObjectId("658ab0418a4dcfd166a80344")).Name</h5>
+                            <h5>Окрас:</h5>
+                            @foreach (var a in properties.FindAll(x => x.PropTypeRef == new ObjectId("658ab0a38a4dcfd166a80346")))
+                            {
+                                <div style="font-size: small; font-weight: 500">@a.Name</div>
+                            }
+                        }
+
+                    }
+                    
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="Close">Закрыть</button>
+                    <button type="button" class="btn btn-primary" style="font-size: small; min-width: 200px;">Позвонить</button>
+
+                    <button type="button" class="btn btn-secondary" style="font-size: small; min-width: 200px;" @onclick="Close">Закрыть</button>
                 </div>
             </div>
         </div>

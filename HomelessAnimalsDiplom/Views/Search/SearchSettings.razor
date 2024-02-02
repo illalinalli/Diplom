@@ -1,4 +1,5 @@
-﻿@using HomelessAnimalsDiplom.Views.Shared.Components;
+﻿@using HomelessAnimalsDiplom.Views.Advertisement;
+@using HomelessAnimalsDiplom.Views.Shared.Components;
 @using HomelessAnimalsDiplom.Models;
 @using Microsoft.AspNetCore.Components.Rendering;
 @using System.Globalization;
@@ -14,6 +15,7 @@
     public SearchComponent? Search;
     List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
     public static List<Item> res;
+    public AdvertisementDetailComponent AdvertisementDetail = new();
 
     void AnimalTypeChanged(ObjectId id)
     {
@@ -119,10 +121,11 @@
             && x.Properties.Contains(propertyValue.Id));
         }
     }
-
-    public void GetItem(Item item)
+  
+  
+    public void ShowDetails(Item item)
     {
-        
+        AdvertisementDetail.ShowDialog(item, null, null);
     }
 }
 
@@ -213,7 +216,7 @@
                                 <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
                               @*  <p class="card-text">@item.LongDescription</p>*@
                                 <div class="card-button-container">
-                                    <a href="Advertisement/AdvertisementDetailView" class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="() => GetItem(item)">Подробнее...</a>
+                                    <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="() => ShowDetails(item)">Подробнее...</button>
                                 </div>
                             </div>
                         </div>
@@ -226,4 +229,5 @@
             }
         </div>
     </div>
+    <AdvertisementDetailComponent @ref="AdvertisementDetail" />
 </div>
