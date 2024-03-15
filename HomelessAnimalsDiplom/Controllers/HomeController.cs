@@ -39,7 +39,7 @@ namespace HomelessAnimalsDiplom.Controllers
                 MainPageModel mainPageModel = new();
                 
                 var httpContext = HttpContext;
-                var s = UserCollection?.Find(new BsonDocument()).ToList();
+                //var s = UserCollection?.Find(new BsonDocument()).ToList();
                 var user = UserCollection?.Find(x => x.Login == Login).FirstOrDefault();
                 mainPageModel.CurUser = user;
                 CurUser = user;
@@ -95,7 +95,8 @@ namespace HomelessAnimalsDiplom.Controllers
                     Id = ObjectId.GenerateNewId(),
                     Name = Name,
                     Login = Login,
-                    Password = hash
+                    Password = hash,
+                    Favorites = new()
                 };
                 // добавляем пользователя в БД
                 var filter = Builders<User>.Filter.Eq("_id", user.Id);

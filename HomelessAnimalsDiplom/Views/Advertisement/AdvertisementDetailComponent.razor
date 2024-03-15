@@ -1,26 +1,39 @@
-﻿@using HomelessAnimalsDiplom.Models;
+﻿@using Newtonsoft.Json;
+@using HomelessAnimalsDiplom.Models;
 @using static HomelessAnimalsDiplom.Models.Database;
 @using MongoDB.Bson;
 @using MongoDB.Driver;
 @using static HomelessAnimalsDiplom.Views.Advertisement.AdvertisementSettings;
+@using static HomelessAnimalsDiplom.Controllers.HomeController;
+
 @code {
 
     bool Shown;
-    Action OnYes;
-    Action OnClose;
+    Action? OnYes;
+    Action? OnClose;
     Item selectedItem;
-    List<PropertyValue> properties;
+    List<PropertyValue>? properties;
+    bool popupShown;
+    bool isFavorite;
+
     public void ShowDialog(Item item, Action onYes = null, Action onClose = null)
     {
         OnYes = onYes;
         Shown = true;
         selectedItem = item;
+        if (CurUser != null)
+        {
+            if (CurUser.Favorites == null)
+            {
+                CurUser.Favorites = new();
+            }
+            isFavorite = CurUser.Favorites.Any(x => x == selectedItem.Id);
+        }
         properties = new();
         foreach (var p in item.Properties)
         {
             properties.Add(propertyValues.FirstOrDefault(x => x.Id == p));
         }
-
         StateHasChanged();
     }
 
@@ -28,8 +41,69 @@
     {
         OnClose?.Invoke();
         Shown = false;
+
+        if (CurUser != null)
+        {
+            // обновляем user
+            var filter = Builders<User>.Filter.Eq("_id", CurUser.Id);
+            // выполнение операции upsert
+            UserCollection?.ReplaceOneAsync(filter, CurUser, ReplaceOptionsUpsert);
+        }
         StateHasChanged();
     }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender && Shown)
+    //    {
+    //        await JSRuntime.InvokeVoidAsync("initCarousel");
+    //    }
+    //}
+
+    //int slideIndex = 0;
+    //void MoveSlide(int n)
+    //{
+    //    slideIndex += n;
+
+    //    if (slideIndex < 0)
+    //    {
+    //        slideIndex = selectedItem.Images.Count - 1;
+    //    }
+    //    else if (slideIndex >= selectedItem.Images.Count)
+    //    {
+    //        slideIndex = 0;
+    //    }
+    //}
+
+    void Call()
+    {
+        popupShown = true;
+        StateHasChanged();
+    }
+
+    void ClickOnFav()
+    {
+        if (CurUser == null) return;
+        isFavorite = !isFavorite;
+
+        if (isFavorite)
+        {
+            CurUser.Favorites?.Add(selectedItem.Id);
+
+        }
+        else
+        {
+            CurUser.Favorites?.Remove(selectedItem.Id);
+
+        }
+
+    }
+    void HoldPopup()
+    {
+        popupShown = false;
+        StateHasChanged();
+    }
+
 }
 
 @if (Shown)
@@ -38,32 +112,68 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Подробности о животном</h5>
+                    <h3 class="modal-title" style="color: gray;">Подробности о животном</h3>
                     <button type="button" class="btn-close" @onclick="Close"></button>
                 </div>
                 <div class="modal-body">
                     @if (selectedItem != null)
                     {
-                        <h4>@selectedItem.Title</h4>
-                        <h5>@selectedItem.LongDescription</h5>
-                        <h5>Порода: @BreedCollection.Find(x => x.Id == selectedItem.BreedRef).FirstOrDefault().Name</h5>
+                        <h1 class="mb-4">@selectedItem.Title</h1>
+                        
+                            @if (isFavorite)
+                            {
+                                <button type="button" class="btn btn-secondary-outline btn-lg mb-4" style="background-color: lightgray; color: black; font-weight: 400;" @onclick="ClickOnFav">
+                                    <i class="bi bi-heart-fill"></i> В избранном
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-secondary-outline btn-lg mb-4" style="background-color: lightgray; color: black; font-weight: 400;" @onclick="ClickOnFav">
+                                    <i class="bi bi-heart"></i> Добавить в избранное
+                                </button>
+                            }
+                        
+                        <div id="animalCarousel" class="my-carousel mb-4">
+
+                            <div class="carousel">
+                                @foreach (var img in selectedItem.Images)
+                                {
+                                    <div class="slide">
+                                        <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(img)}")" alt="Image @(selectedItem.Images.IndexOf(img)+1)">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <h2>О животном</h2>
+                        <h4 class="decription-item">Порода: @BreedCollection.Find(x => x.Id == selectedItem.BreedRef).FirstOrDefault().Name</h4>
                         @if (properties != null)
                         {
-                            <h5>Пол: @properties.FirstOrDefault(x => x.PropTypeRef == new ObjectId("658ab0418a4dcfd166a80344")).Name</h5>
-                            <h5>Окрас:</h5>
+                            <h4 class="decription-item">Пол: @properties.FirstOrDefault(x => x.PropTypeRef == new ObjectId("658ab0418a4dcfd166a80344")).Name</h4>
+                            @*<h4>Окрас: </h4>
                             @foreach (var a in properties.FindAll(x => x.PropTypeRef == new ObjectId("658ab0a38a4dcfd166a80346")))
                             {
                                 <div style="font-size: small; font-weight: 500">@a.Name</div>
-                            }
+                            }*@
                         }
+                        <h2>Описание</h2>
+                        <h4 class="decription-item">@selectedItem.LongDescription</h4>
 
                     }
-                    
+                    @if (popupShown)
+                    {
+                        
+                        <h5 class="popup-call">Вы сделали дозвон в Азербайджан. Скоро вам перезвонят.</h5>
+                        Thread.Sleep(7000);
+                    }
+                    @*@if (popupShown) {
+                        
+                        //HoldPopup();
+                    }*@
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" style="font-size: small; min-width: 200px;">Позвонить</button>
-
-                    <button type="button" class="btn btn-secondary" style="font-size: small; min-width: 200px;" @onclick="Close">Закрыть</button>
+                    <button type="button" class="btn btn-primary-outline" style="font-size: small; flex: 1; background-color: forestgreen; color: white;" @onclick="Call">Позвонить</button>
+                    <button type="button" class="btn btn-secondary-outline " style="font-size: small; flex: 1; background-color: lightgray; color: black; font-weight: 400;" @onclick="Close">Закрыть</button>
                 </div>
             </div>
         </div>

@@ -1,6 +1,7 @@
 using HomelessAnimalsDiplom.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.JSInterop;
 using System.Net;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -21,8 +22,8 @@ services.AddServerSideBlazor(options => { options.DetailedErrors = true; });
 HtmlEncoder DefaultHtmlEncoder = HtmlEncoder.Create(allowedRanges: new[] {
     UnicodeRanges.All
 });
-Utils.HtmlEncoder = DefaultHtmlEncoder;
 
+Utils.HtmlEncoder = DefaultHtmlEncoder;
 services.AddSingleton(DefaultHtmlEncoder);
 
 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

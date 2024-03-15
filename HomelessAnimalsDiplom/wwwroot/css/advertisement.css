@@ -1,0 +1,40 @@
+﻿body {
+}
+
+.carousel {
+    display: flex;
+    overflow: hidden;
+}
+
+.carousel img {
+    max-width: 400px;
+    max-height: 310px;
+    margin: auto;
+}
+
+.slide {
+    flex: 0 0 100%;
+    transition: transform 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.img {
+    width: 100%;
+}
+
+.decription-item {
+    font-weight: 400;
+}
+
+.popup-call {
+    position:fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    color: darkred;
+}
