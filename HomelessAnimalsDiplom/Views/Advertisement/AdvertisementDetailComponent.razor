@@ -1,22 +1,45 @@
-﻿@using Newtonsoft.Json;
+﻿@using HomelessAnimalsDiplom.Views.Home;
+@using Newtonsoft.Json;
 @using HomelessAnimalsDiplom.Models;
 @using static HomelessAnimalsDiplom.Models.Database;
 @using MongoDB.Bson;
 @using MongoDB.Driver;
 @using static HomelessAnimalsDiplom.Views.Advertisement.AdvertisementSettings;
 @using static HomelessAnimalsDiplom.Controllers.HomeController;
+@using static HomelessAnimalsDiplom.Views.Home.MainPageSettings;
 
 @code {
 
     bool Shown;
-    Action? OnYes;
-    Action? OnClose;
+    public Action? OnYes;
+    public Action? OnClose;
     Item selectedItem;
     List<PropertyValue>? properties;
     bool popupShown;
     bool isFavorite;
+    FavoritesComponent favorites = new();
+    bool ShowComponent;
 
-    public void ShowDialog(Item item, Action onYes = null, Action onClose = null)
+    [Parameter]
+    public MainPageSettings MainPage { get; set; }
+
+    [Parameter]
+    public FavoritesComponent FavoritesComp { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    public event Action? OnUpdateMainPage;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        string currentUrl = NavigationManager.Uri;
+        var last = currentUrl.Split("/").LastOrDefault();
+        ShowComponent = last == "FavoritesPage" ? true : false;
+    }
+
+    public void ShowDialog(Item item, Action onYes, Action onClose)
     {
         OnYes = onYes;
         Shown = true;
@@ -37,6 +60,24 @@
         StateHasChanged();
     }
 
+    public void AddToViewingHistory(ObjectId itemId)
+    {
+        if (CurUser == null) return;
+        if (CurUser.ViewingHistory == null)
+        {
+            CurUser.ViewingHistory = new List<HistoryItem>();
+        }
+        if (selectedItem.UserRef != CurUser.Id)
+        {
+            CurUser.ViewingHistory.Add(new HistoryItem
+            {
+                ItemId = itemId,
+                ViewedAt = DateTimeOffset.UtcNow
+            });
+        }
+    }
+
+
     void Close()
     {
         OnClose?.Invoke();
@@ -46,35 +87,22 @@
         {
             // обновляем user
             var filter = Builders<User>.Filter.Eq("_id", CurUser.Id);
+            AddToViewingHistory(selectedItem.Id);
             // выполнение операции upsert
             UserCollection?.ReplaceOneAsync(filter, CurUser, ReplaceOptionsUpsert);
+            
+            if (MainPage != null) {
+                MainPage.Update();
+            }
+
+            if (FavoritesComp != null)
+            {
+                FavoritesComp.Update();
+            }
+            
         }
-        StateHasChanged();
     }
-
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    if (firstRender && Shown)
-    //    {
-    //        await JSRuntime.InvokeVoidAsync("initCarousel");
-    //    }
-    //}
-
-    //int slideIndex = 0;
-    //void MoveSlide(int n)
-    //{
-    //    slideIndex += n;
-
-    //    if (slideIndex < 0)
-    //    {
-    //        slideIndex = selectedItem.Images.Count - 1;
-    //    }
-    //    else if (slideIndex >= selectedItem.Images.Count)
-    //    {
-    //        slideIndex = 0;
-    //    }
-    //}
-
+   
     void Call()
     {
         popupShown = true;
@@ -89,12 +117,10 @@
         if (isFavorite)
         {
             CurUser.Favorites?.Add(selectedItem.Id);
-
         }
         else
         {
             CurUser.Favorites?.Remove(selectedItem.Id);
-
         }
 
     }
@@ -160,15 +186,14 @@
                         <h4 class="decription-item">@selectedItem.LongDescription</h4>
 
                     }
-                    @if (popupShown)
+                   @* @if (popupShown)
                     {
-                        
                         <h5 class="popup-call">Вы сделали дозвон в Азербайджан. Скоро вам перезвонят.</h5>
-                        Thread.Sleep(7000);
-                    }
-                    @*@if (popupShown) {
+                        //Thread.Sleep(7000);
+                    }*@
+                   @* @if (popupShown) {
                         
-                        //HoldPopup();
+                        HoldPopup();
                     }*@
                 </div>
                 <div class="modal-footer">
@@ -178,4 +203,8 @@
             </div>
         </div>
     </div>
+
 }
+
+
+    

@@ -38,3 +38,36 @@
     border: 1px solid #ccc;
     color: darkred;
 }
+
+.heart-layout.bi-heart-fill {
+    color: #000000;
+    transition: color 0.3s;
+}
+
+.heart-layout.bi-heart-fill:hover {
+    color: #838B8B;
+}
+
+.dropdown-toggle::before {
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-toggle.bi.bi-person-circle {
+    transform: translateY(2px);
+}
+
+.navbar-brand {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.viewed-post {
+    opacity: 0.5;
+}
+
+/*.card {
+    width: 24rem !important;
+}*/

@@ -1,0 +1,65 @@
+﻿@using HomelessAnimalsDiplom.Models;
+@using static HomelessAnimalsDiplom.Models.Database;
+@using HomelessAnimalsDiplom.Views.Advertisement;
+@using MongoDB.Bson;
+@using MongoDB.Driver;
+@using static Controllers.HomeController;
+@code {
+    List<Item> Items;
+    public AdvertisementDetailComponent? AdvertisementDetail;
+    // тут Edit будет
+    public void ShowDetails(Item item)
+    {
+        AdvertisementDetail?.ShowDialog(item, null, null);
+    }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (CurUser != null)
+        {
+            Items = ItemCollection.Find(x => x.UserRef == CurUser.Id).ToList();
+        }
+        else
+        {
+            return;
+        }
+    }
+}
+@if (CurUser != null)
+{
+    <div class="container-fluid">
+        <h4 class="mb-4">Пользователь: @CurUser.Name</h4>
+        <div class="row mb-4">
+            <div class="col" style="font-weight:600; font-size: medium;">Мои объявления</div>
+        </div>
+        <div class="row">
+            <div class="col">
+                @if (Items.Count != 0)
+                {
+                    foreach (var item in Items)
+                    {
+                        <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
+                            <div class="card" style="width: 24rem;">
+                                @if (item.Images?.Count != 0)
+                                {
+                                    <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(item.Images.First())}")" alt="Image" class="d-block w-100 card-img">
+                                }
+                                <div class="card-body">
+                                    <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
+                                    <div class="card-button-container">
+                                        <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="()=>ShowDetails(item)">Редактировать</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <h5 style="color: gray;">У вас нет публикаций.</h5>
+                }
+            </div>
+        </div>
+        <AdvertisementDetailComponent @ref="AdvertisementDetail" />
+    </div>
+}

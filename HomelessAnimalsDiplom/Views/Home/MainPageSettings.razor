@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Components.Rendering;
 @using System.Globalization;
 @using HomelessAnimalsDiplom.Controllers;
+@using static Controllers.HomeController;
 @using static HomelessAnimalsDiplom.Models.Database;
 @using static HomelessAnimalsDiplom.Views.Advertisement.AdvertisementSettings;
 @using MongoDB.Bson;
@@ -12,10 +13,30 @@
     public List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList();
     List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
     public SearchComponent? Search;
-    public AdvertisementDetailComponent AdvertisementDetail;
+    public static AdvertisementDetailComponent? AdvertisementDetail = new();
+    public static MainPageSettings MainPage = new();
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (AdvertisementDetail != null)
+        {
+            AdvertisementDetail.OnUpdateMainPage += Update;
+        }
+    }
     public void ShowDetails(Item item)
     {
-        AdvertisementDetail.ShowDialog(item, null, null);
+        AdvertisementDetail?.ShowDialog(item, null, null);
+    }
+    public bool IsWatchedItem(Item item)
+    {
+        if (CurUser.ViewingHistory == null) return false;
+        if (CurUser.ViewingHistory.FirstOrDefault(x => x.ItemId == item.Id) != null) return true;
+        return false;
+    }
+
+    public void Update()
+    {
+        StateHasChanged();
     }
 }
 
@@ -26,15 +47,21 @@
     </div>
     <div class="row">
         <div class="col">
-            @if (Items.Count != 0)
+            @if (CurUser != null && Items.Count != 0)
             {
                 foreach (var item in Items)
                 {
                     <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
-                        <div class="card" style="width: 24rem;">
+                        <div class="card" style="@(IsWatchedItem(item).StrIf("opacity: 0.65;"))  width: 24rem;">
                             @if (item.Images?.Count != 0)
                             {
                                 <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(item.Images.First())}")" alt="Image" class="d-block w-100 card-img">
+                            }
+                            @if (IsWatchedItem(item))
+                            {
+                                <div style="position: absolute; top: 10px; right: 10px; background-color: #3c4246a6; opacity: 1; color: white; padding: 5px; border-radius: 5px; width: auto;">
+                                    <span style="font-size: 14px; font-weight: 400; letter-spacing: 0.03em;">Просмотрено 👁</span>
+                                </div>
                             }
                             <div class="card-body">
                                 <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
@@ -52,6 +79,7 @@
             }
         </div>
     </div>
-    <AdvertisementDetailComponent @ref="AdvertisementDetail" />
+    @*<AdvertisementDetailComponent @ref="AdvertisementDetail" MainPage="this" />*@
+    <AdvertisementDetailComponent @ref="AdvertisementDetail" MainPage="this" />
 </div>
 

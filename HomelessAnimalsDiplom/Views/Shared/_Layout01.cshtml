@@ -31,9 +31,25 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="col-lg-3 col-md-4 col-sm-6 col-12 navbar-brand" asp-controller="Home" style="letter-spacing: 0.07em; font: caption;" asp-action="MainPage">HomelessAnimals</a>
-                <a class="col-lg-3 col-md-4 col-sm-6 col-12 navbar-brand" asp-controller="Advertisement" style="letter-spacing: 0.07em; font: caption;" asp-action="AdvertisementView">Создать объявление</a>
-                <a class="col-lg-3 col-md-4 col-sm-6 col-12 navbar-brand" asp-controller="Home" style="letter-spacing: 0.07em; font: caption;" asp-action="Logout">Выйти</a>
+                <a class="navbar-brand" asp-controller="Home" style="letter-spacing: 0.07em; font: caption;" asp-action="MainPage">HomelessAnimals</a>
+                <a class="heart-layout navbar-brand bi bi-heart-fill" asp-controller="Home" style="letter-spacing: 0.07em; font: caption;" asp-action="FavoritesPage">
+                </a>
+                <div class="navbar-brand" style="letter-spacing: 0.07em; font: caption;">
+                    <div class="dropdown">
+                        <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                            <span class="bi bi-person-circle" style="font-size: 3em;"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            @*<li><a class="dropdown-item" href="#">Настройки</a></li>*@
+                            <li><a class="dropdown-item" href="/Home/UserProfilePage">Профиль</a></li>
+                            @*<li><a class="dropdown-item" href="#">Настройки</a></li>*@
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" asp-controller="Home" asp-action="Logout">Выйти</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <a class="navbar-brand" asp-controller="Advertisement" style="letter-spacing: 0.07em; font: caption;" asp-action="AdvertisementView">Создать объявление</a>
+               @* <a class="navbar-brand" asp-controller="Home" style="letter-spacing: 0.07em; font: caption;" asp-action="Logout">Выйти</a>*@
             </div>
         </nav>
     </header>
