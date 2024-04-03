@@ -1,0 +1,215 @@
+﻿@using HomelessAnimalsDiplom.Views.Advertisement;
+@using HomelessAnimalsDiplom.Views.Home;
+@using Models;
+@using static HomelessAnimalsDiplom.Models.Database;
+@using MongoDB.Bson;
+@using MongoDB.Driver;
+@using static Controllers.HomeController;
+@code {
+    public List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList();
+    public List<Item> RecommendationItems = new();
+    public static AdvertisementDetailComponent? AdvertisementDetail = new();
+    public static MainPageSettings MainPage = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        RecommendationItems = GetRecommendations(CurUser, Items);
+        if (CurUser == null || Items == null) return;
+
+    }
+
+    public bool IsWatchedItem(Item item)
+    {
+        if (CurUser.ViewingHistory == null) return false;
+        if (CurUser.ViewingHistory.FirstOrDefault(x => x.ItemId == item.Id) != null) return true;
+        return false;
+    }
+
+    public void Update()
+    {
+        StateHasChanged();
+    }
+
+    public void ShowDetails(Item item)
+    {
+        AdvertisementDetail?.ShowDialog(item, null, null);
+    }
+
+    public List<Item> GetRecommendations(User user, List<Item> allItems)
+    {
+        // Упорядоченный список рекомендаций
+        List<Item> recommendations = new List<Item>();
+        Dictionary<ObjectId, double> itemSimilarities = new Dictionary<ObjectId, double>();
+
+        // Настройка порогового значения сходства
+        double similarityThreshold = 0.3; // Настраиваемый параметр
+        List<double> userPreferences = GetUserPreferencesVector(user, allItems);
+        // Подсчет сходства между предпочтениями пользователя и свойствами каждой публикации
+        foreach (var item in allItems)
+        {
+            double similarity = CalculateSimilarity(user, item, allItems);
+            itemSimilarities.Add(item.Id, similarity);
+        }
+
+        // Сортировка публикаций по убыванию сходства и получение рекомендаций
+        var sortedSimilarities = itemSimilarities.OrderByDescending(x => x.Value);
+        foreach (var pair in sortedSimilarities)
+        {
+            recommendations.Add(allItems.Find(i => i.Id == pair.Key));
+            // Проверка порогового значения сходства
+            //if (pair.Value >= similarityThreshold)
+            //{
+            //    // Добавление рекомендации в список
+            //    recommendations.Add(allItems.Find(i => i.Id == pair.Key));
+            //}
+        }
+        // Устранение дубликатов
+        recommendations = recommendations.Distinct().Take(3).ToList();
+        return recommendations;
+    }
+
+    private List<double> GetItemPropertiesVector(Item item)
+    {
+        List<double> vector = new List<double>();
+        // Создаем вектор свойств публикации, учитывая ее свойства
+        if (item.Properties != null)
+        {
+            foreach (var propertyId in item.Properties)
+            {
+                // Добавление значения свойства в вектор свойств
+                var property = Database.PropertyValueCollection.Find(p => p.Id == propertyId).FirstOrDefault();
+                if (property != null)
+                {
+                    vector.Add(property.Id.GetHashCode());
+                }
+            }
+        }
+        return vector;
+    }
+
+    private List<double> GetUserPreferencesVector(User user, List<Item> allItems)
+    {
+        List<double> vector = new List<double>();
+        if (user.Favorites != null)
+        {
+            foreach (var favoriteId in user.Favorites)
+            {
+                var favoriteItem = allItems.Find(i => i.Id == favoriteId && i.IsPublished);
+                if (favoriteItem != null)
+                {
+                    vector.AddRange(GetItemPropertiesVector(favoriteItem));
+                }
+            }
+        }
+        return vector;
+    }
+    //public double CalculateSimilarity(User user, Item item, List<Item> allItems)
+    //{
+    //    var userPreferences = GetUserPreferencesVector(user, allItems);
+    //    var itemProperties = GetItemPropertiesVector(item);
+    //    double dotProduct = userPreferences.Zip(itemProperties, (x, y) => x * y).Sum();
+    //    double userPreferencesMagnitude = Math.Sqrt(userPreferences.Sum(x => x * x));
+    //    double itemPropertiesMagnitude = Math.Sqrt(itemProperties.Sum(x => x * x));
+
+    //    if (userPreferencesMagnitude == 0 || itemPropertiesMagnitude == 0)
+    //    {
+    //        return 0;
+    //    }
+    //    double similarity = dotProduct / (userPreferencesMagnitude * itemPropertiesMagnitude);
+    //    // Учитывать веса
+    //    similarity = 0.7 * similarity + 0.3; // Измените коэффициенты в соответствии с вашими предпочтениями
+    //    return similarity;
+    //}
+
+    //public double CalculateSimilarity(User user, Item item, List<Item> allItems)
+    //{
+    //    var userPreferences = GetUserPreferencesVector(user, allItems);
+    //    var itemProperties = GetItemPropertiesVector(item);
+
+    //    // Применение весов к просмотрам и понравившимся элементам пользователя
+    //    userPreferences = userPreferences.Select((val, index) => userPreferences[index] * 0.7).ToList();
+    //    itemProperties = itemProperties.Select((val, index) => itemProperties[index] * 1.0).ToList();
+
+    //    double dotProduct = userPreferences.Zip(itemProperties, (x, y) => x * y).Sum();
+    //    double userPreferencesMagnitude = Math.Sqrt(userPreferences.Sum(x => x * x));
+    //    double itemPropertiesMagnitude = Math.Sqrt(itemProperties.Sum(x => x * x));
+
+    //    if (userPreferencesMagnitude == 0 || itemPropertiesMagnitude == 0)
+    //    {
+    //        return 0;
+    //    }
+
+    //    double similarity = dotProduct / (userPreferencesMagnitude * itemPropertiesMagnitude);
+    //    similarity = 0.7 * similarity + 0.3; // Можно настроить коэффициенты по-другому
+    //    return similarity;
+    //}
+
+    public double CalculateSimilarity(User user, Item item, List<Item> allItems)
+{
+    List<ObjectId> viewedItemIds = user.ViewingHistory.Select(h => h.ItemId).ToList();
+    
+    var userPreferences = new List<double>(GetUserPreferencesVector(user, allItems));
+    var itemProperties = new List<double>(GetItemPropertiesVector(item));
+
+    // Учитываем историю просмотров пользователя
+    foreach (var itemId in viewedItemIds)
+    {
+        var viewedItem = allItems.Find(i => i.Id == itemId && i.IsPublished);
+        if (viewedItem != null)
+        {
+            userPreferences.AddRange(GetItemPropertiesVector(viewedItem));
+        }
+    }
+
+    double dotProduct = userPreferences.Zip(itemProperties, (x, y) => x * y).Sum();
+    double userPreferencesMagnitude = Math.Sqrt(userPreferences.Sum(x => x * x));
+    double itemPropertiesMagnitude = Math.Sqrt(itemProperties.Sum(x => x * x));
+
+    if (userPreferencesMagnitude == 0 || itemPropertiesMagnitude == 0)
+    {
+        return 0;
+    }
+
+    double similarity = dotProduct / (userPreferencesMagnitude * itemPropertiesMagnitude);
+
+    // Учитываем веса
+    similarity = 0.7 * similarity + 0.3; // Измените коэффициенты в соответствии с вашими предпочтениями
+
+    return similarity;
+}
+
+}
+@if (RecommendationItems.Count() != 0)
+{
+    foreach (var item in RecommendationItems)
+    {
+        <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
+            <div class="card" style="@(IsWatchedItem(item).StrIf("opacity: 0.65;"))  width: 24rem;">
+                @if (item.Images?.Count != 0)
+                {
+                    <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(item.Images.First())}")" alt="Image" class="d-block w-100 card-img">
+                }
+                @if (IsWatchedItem(item))
+                {
+                    <div style="position: absolute; top: 10px; right: 10px; background-color: #3c4246a6; opacity: 1; color: white; padding: 5px; border-radius: 5px; width: auto;">
+                        <span style="font-size: 14px; font-weight: 400; letter-spacing: 0.03em;">Просмотрено 👁</span>
+                    </div>
+                }
+                <div class="card-body">
+                    <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
+                    <div class="card-button-container">
+                        <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="()=>ShowDetails(item)">Подробнее...</button>
+                    </div>
+                </div>
+            </div>
+            <AdvertisementDetailComponent @ref="AdvertisementDetail" RecommendationsComp="this" />
+        </div>
+    }
+}
+else
+{
+    <h5 style="color: gray;">Предложений пока нет</h5>
+}
+
+                

@@ -1,4 +1,5 @@
 ﻿@using HomelessAnimalsDiplom.Views.Home;
+@using HomelessAnimalsDiplom.Views.Recommendations;
 @using Newtonsoft.Json;
 @using HomelessAnimalsDiplom.Models;
 @using static HomelessAnimalsDiplom.Models.Database;
@@ -22,6 +23,9 @@
 
     [Parameter]
     public MainPageSettings MainPage { get; set; }
+
+    [Parameter]
+    public RecommendationsComponent RecommendationsComp { get; set; }
 
     [Parameter]
     public FavoritesComponent FavoritesComp { get; set; }
@@ -92,13 +96,18 @@
             // выполнение операции upsert
             UserCollection?.ReplaceOneAsync(filter, CurUser, ReplaceOptionsUpsert);
             
-            if (MainPage != null) {
-                MainPage.Update();
-            }
+            //if (MainPage != null) {
+            //    MainPage.Update();
+            //}
 
             if (FavoritesComp != null)
             {
                 FavoritesComp.Update();
+            }
+
+            if (RecommendationsComp != null)
+            {
+                RecommendationsComp.Update();
             }
             
         }

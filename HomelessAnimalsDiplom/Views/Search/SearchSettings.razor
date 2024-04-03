@@ -14,7 +14,7 @@
 @code {
     public SearchComponent? Search;
     List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
-    public static List<Item> res;
+    public static List<Item> Result;
     public AdvertisementDetailComponent AdvertisementDetail = new();
 
     void AnimalTypeChanged(ObjectId id)
@@ -59,7 +59,7 @@
     public static void FindItems()
     {
         List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList().FindAll(x => x.UserRef != CurUser.Id);
-        res = new();
+        Result = new();
         bool colorIsEmpty; // false
         bool typeIsEmpty;
         bool breedIsEmpty;
@@ -93,31 +93,31 @@
         // всё пустое - ищем все публикации
         if (breedIsEmpty && typeIsEmpty && colorIsEmpty)
         {
-            res = Items;
+            Result = Items;
         }
         // добавить ещё в условия пользователя curUser != x.UserRef
         if (!typeIsEmpty && breedIsEmpty && colorIsEmpty)
         {
             // только по типу
-            res = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id);
+            Result = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id);
 
         }
 
         if (!typeIsEmpty && !breedIsEmpty && colorIsEmpty)
         {
-            res = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
+            Result = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
             && x.BreedRef == breed.Id);
         }
 
         if (!typeIsEmpty && !breedIsEmpty && !colorIsEmpty)
         {
-            res = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
+            Result = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
             && x.BreedRef == breed.Id && x.Properties.Contains(propertyValue.Id));
         }
 
         if (!typeIsEmpty && breedIsEmpty && !colorIsEmpty)
         {
-            res = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
+            Result = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
             && x.Properties.Contains(propertyValue.Id));
         }
     }
@@ -126,6 +126,13 @@
     public void ShowDetails(Item item)
     {
         AdvertisementDetail.ShowDialog(item, null, null);
+    }
+
+    public bool IsWatchedItem(Item item)
+    {
+        if (CurUser.ViewingHistory == null) return false;
+        if (CurUser.ViewingHistory.FirstOrDefault(x => x.ItemId == item.Id) != null) return true;
+        return false;
     }
 }
 
@@ -183,44 +190,40 @@
     </div>
     <div class="row">
         <div class="col">
-            @if (res.Count != 0)
+            @if (Result.Count != 0)
             {
-                // выводим публикации
-                foreach (var item in res)
+                @if (Result.Count() != 0)
                 {
-                    <div class="col-lg-3 col-md-5 col-sm-6 col-12 pt-3 pb-5">
-                        <div class="card" style="width: 24rem;">
-                            @if (item.Images?.Count != 0)
-                            {
-                                <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
-                                    <div class="carousel-inner">
-                                        @foreach (var img in item.Images)
-                                        {
-                                            <div class="carousel-item @((item.Images.IndexOf(img) == 0).StrIf("active"))" data-bs-interval="5000">
-                                                <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(img)}")" alt="Image" class="d-block w-100 card-img">
-                                            </div>
-                                        }
+                    foreach (var item in Result)
+                    {
+                        if (item.Images != null)
+                        {
+                            <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
+                                <div class="card" style="@(IsWatchedItem(item).StrIf("opacity: 0.65;"))  width: 24rem;">
+                                    @if (item.Images?.Count != 0)
+                                    {
+                                        <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(item.Images.First())}")" alt="Image" class="d-block w-100 card-img">
+                                    }
+                                    @if (IsWatchedItem(item))
+                                    {
+                                        <div style="position: absolute; top: 10px; right: 10px; background-color: #3c4246a6; opacity: 1; color: white; padding: 5px; border-radius: 5px; width: auto;">
+                                            <span style="font-size: 14px; font-weight: 400; letter-spacing: 0.03em;">Просмотрено 👁</span>
+                                        </div>
+                                    }
+                                    <div class="card-body">
+                                        <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
+                                        <div class="card-button-container">
+                                            <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="()=>ShowDetails(item)">Подробнее...</button>
+                                        </div>
                                     </div>
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
-                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Предыдущий</span>
-                                    </button>
-                                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
-                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Следующий</span>
-                                    </button>
-                                </div>
-                            }
-
-                            <div class="card-body">
-                                <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
-                              @*  <p class="card-text">@item.LongDescription</p>*@
-                                <div class="card-button-container">
-                                    <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="() => ShowDetails(item)">Подробнее...</button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        }
+                    }
+                }
+                else
+                {
+                    <h5 style="color: gray;">Здесь появятся ваши избранные публикации.</h5>
                 }
             }
             else
