@@ -104,80 +104,40 @@
         }
         return vector;
     }
-    //public double CalculateSimilarity(User user, Item item, List<Item> allItems)
-    //{
-    //    var userPreferences = GetUserPreferencesVector(user, allItems);
-    //    var itemProperties = GetItemPropertiesVector(item);
-    //    double dotProduct = userPreferences.Zip(itemProperties, (x, y) => x * y).Sum();
-    //    double userPreferencesMagnitude = Math.Sqrt(userPreferences.Sum(x => x * x));
-    //    double itemPropertiesMagnitude = Math.Sqrt(itemProperties.Sum(x => x * x));
-
-    //    if (userPreferencesMagnitude == 0 || itemPropertiesMagnitude == 0)
-    //    {
-    //        return 0;
-    //    }
-    //    double similarity = dotProduct / (userPreferencesMagnitude * itemPropertiesMagnitude);
-    //    // Учитывать веса
-    //    similarity = 0.7 * similarity + 0.3; // Измените коэффициенты в соответствии с вашими предпочтениями
-    //    return similarity;
-    //}
-
-    //public double CalculateSimilarity(User user, Item item, List<Item> allItems)
-    //{
-    //    var userPreferences = GetUserPreferencesVector(user, allItems);
-    //    var itemProperties = GetItemPropertiesVector(item);
-
-    //    // Применение весов к просмотрам и понравившимся элементам пользователя
-    //    userPreferences = userPreferences.Select((val, index) => userPreferences[index] * 0.7).ToList();
-    //    itemProperties = itemProperties.Select((val, index) => itemProperties[index] * 1.0).ToList();
-
-    //    double dotProduct = userPreferences.Zip(itemProperties, (x, y) => x * y).Sum();
-    //    double userPreferencesMagnitude = Math.Sqrt(userPreferences.Sum(x => x * x));
-    //    double itemPropertiesMagnitude = Math.Sqrt(itemProperties.Sum(x => x * x));
-
-    //    if (userPreferencesMagnitude == 0 || itemPropertiesMagnitude == 0)
-    //    {
-    //        return 0;
-    //    }
-
-    //    double similarity = dotProduct / (userPreferencesMagnitude * itemPropertiesMagnitude);
-    //    similarity = 0.7 * similarity + 0.3; // Можно настроить коэффициенты по-другому
-    //    return similarity;
-    //}
-
+   
     public double CalculateSimilarity(User user, Item item, List<Item> allItems)
-{
-    List<ObjectId> viewedItemIds = user.ViewingHistory.Select(h => h.ItemId).ToList();
+    {
+        List<ObjectId> viewedItemIds = user.ViewingHistory.Select(h => h.ItemId).ToList();
     
-    var userPreferences = new List<double>(GetUserPreferencesVector(user, allItems));
-    var itemProperties = new List<double>(GetItemPropertiesVector(item));
+        var userPreferences = new List<double>(GetUserPreferencesVector(user, allItems));
+        var itemProperties = new List<double>(GetItemPropertiesVector(item));
 
-    // Учитываем историю просмотров пользователя
-    foreach (var itemId in viewedItemIds)
-    {
-        var viewedItem = allItems.Find(i => i.Id == itemId && i.IsPublished);
-        if (viewedItem != null)
+        // Учитываем историю просмотров пользователя
+        foreach (var itemId in viewedItemIds)
         {
-            userPreferences.AddRange(GetItemPropertiesVector(viewedItem));
+            var viewedItem = allItems.Find(i => i.Id == itemId && i.IsPublished);
+            if (viewedItem != null)
+            {
+                userPreferences.AddRange(GetItemPropertiesVector(viewedItem));
+            }
         }
+
+        double dotProduct = userPreferences.Zip(itemProperties, (x, y) => x * y).Sum();
+        double userPreferencesMagnitude = Math.Sqrt(userPreferences.Sum(x => x * x));
+        double itemPropertiesMagnitude = Math.Sqrt(itemProperties.Sum(x => x * x));
+
+        if (userPreferencesMagnitude == 0 || itemPropertiesMagnitude == 0)
+        {
+            return 0;
+        }
+
+        double similarity = dotProduct / (userPreferencesMagnitude * itemPropertiesMagnitude);
+
+        // Учитываем веса
+        similarity = 0.7 * similarity + 0.3; // Измените коэффициенты в соответствии с вашими предпочтениями
+
+        return similarity;
     }
-
-    double dotProduct = userPreferences.Zip(itemProperties, (x, y) => x * y).Sum();
-    double userPreferencesMagnitude = Math.Sqrt(userPreferences.Sum(x => x * x));
-    double itemPropertiesMagnitude = Math.Sqrt(itemProperties.Sum(x => x * x));
-
-    if (userPreferencesMagnitude == 0 || itemPropertiesMagnitude == 0)
-    {
-        return 0;
-    }
-
-    double similarity = dotProduct / (userPreferencesMagnitude * itemPropertiesMagnitude);
-
-    // Учитываем веса
-    similarity = 0.7 * similarity + 0.3; // Измените коэффициенты в соответствии с вашими предпочтениями
-
-    return similarity;
-}
 
 }
 @if (RecommendationItems.Count() != 0)
