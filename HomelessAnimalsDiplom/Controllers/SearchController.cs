@@ -1,9 +1,9 @@
-﻿using MonkeyShop.Models;
+﻿using HomelessAnimalsDiplom.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
-using static MonkeyShop.Views.Shared.Components.SearchComponent;
+using static HomelessAnimalsDiplom.Views.Shared.Components.SearchComponent;
 
-namespace MonkeyShop.Controllers
+namespace HomelessAnimalsDiplom.Controllers
 {
     public class SearchItem {
         public ObjectId Type;

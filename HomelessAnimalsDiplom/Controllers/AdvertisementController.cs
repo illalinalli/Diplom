@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static MonkeyShop.Controllers.HomeController;
-namespace MonkeyShop.Controllers
+using static HomelessAnimalsDiplom.Controllers.HomeController;
+namespace HomelessAnimalsDiplom.Controllers
 {
     public class AdvertisementController : Controller
     {

@@ -2,7 +2,7 @@
 using MongoDB.Driver;
 using System.Text;
 
-namespace MonkeyShop.Models
+namespace HomelessAnimalsDiplom.Models
 {
     public class Database
     {
@@ -34,7 +34,7 @@ namespace MonkeyShop.Models
         {
             var connectionString = "mongodb://localhost:27017";
             var client = new MongoClient(connectionString);
-            DB = client.GetDatabase("MonkeyShop");
+            DB = client.GetDatabase("HomelessAnimals");
             UserCollection = DB.GetCollection<User>("User");
             ItemCollection = DB.GetCollection<Item>("Item");
             BreedCollection = DB.GetCollection<Breed>("Breed");

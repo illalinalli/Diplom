@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MonkeyShop.Controllers
+namespace HomelessAnimalsDiplom.Controllers
 {
     public class MainPageController : Controller
     {

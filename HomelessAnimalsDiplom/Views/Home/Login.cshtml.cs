@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
-namespace MonkeyShop.Views.Home
+namespace HomelessAnimalsDiplom.Views.Home
 {
     public class LoginModel : PageModel
     {

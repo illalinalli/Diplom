@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace MonkeyShop.Models
+namespace HomelessAnimalsDiplom.Models
 {
     public class HistoryItem
     {

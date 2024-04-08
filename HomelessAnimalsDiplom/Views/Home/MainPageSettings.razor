@@ -1,11 +1,12 @@
-﻿@using MonkeyShop.Models;
-@using MonkeyShop.Views.Advertisement;
-@using MonkeyShop.Views.Shared.Components;
+﻿@using HomelessAnimalsDiplom.Models;
+@using HomelessAnimalsDiplom.Views.Advertisement;
+@using HomelessAnimalsDiplom.Views.Recommendations;
+@using HomelessAnimalsDiplom.Views.Shared.Components;
 @using Microsoft.AspNetCore.Components.Rendering;
 @using System.Globalization;
-@using MonkeyShop.Controllers;
+@using HomelessAnimalsDiplom.Controllers;
 @using static Controllers.HomeController;
-@using static MonkeyShop.Models.Database;
+@using static HomelessAnimalsDiplom.Models.Database;
 
 @using MongoDB.Bson;
 @using MongoDB.Driver;
@@ -14,7 +15,7 @@
     List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
     public SearchComponent? Search;
     
-    //public static RecommendationsComponent? RecommendationsComp = new();
+    public static RecommendationsComponent? RecommendationsComp = new();
     public static MainPageSettings MainPage = new();
 
     protected override void OnInitialized()
@@ -29,14 +30,22 @@
     
 }
 
-@*<SearchComponent @ref="Search" />*@
+<SearchComponent @ref="Search" />
 <div class="container-fluid">
     <div class="row mb-4">
-        <div class="col" style="font-weight:600; font-size: medium;">Наши мартышечки</div>
+        <div class="col" style="font-weight:600; font-size: medium;">Рекомендации для вас</div>
     </div>
     <div class="row">
         <div class="col">
-            
+            @if (CurUser != null)
+            {
+                <RecommendationsComponent @ref="RecommendationsComp" />
+              
+            }
+            else
+            {
+                <h5 style="color: gray;">Предложений пока нет</h5>
+            }
         </div>
     </div>
    

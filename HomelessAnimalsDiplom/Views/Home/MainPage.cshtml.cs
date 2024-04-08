@@ -1,7 +1,7 @@
-using MonkeyShop.Models;
+using HomelessAnimalsDiplom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-namespace MonkeyShop.Views.Home
+namespace HomelessAnimalsDiplom.Views.Home
 {
     public class MainPageModel : PageModel
     {
