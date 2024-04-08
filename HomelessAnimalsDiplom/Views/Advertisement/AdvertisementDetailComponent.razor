@@ -1,13 +1,12 @@
-﻿@using HomelessAnimalsDiplom.Views.Home;
-@using HomelessAnimalsDiplom.Views.Recommendations;
+﻿@using MonkeyShop.Views.Home;
 @using Newtonsoft.Json;
-@using HomelessAnimalsDiplom.Models;
-@using static HomelessAnimalsDiplom.Models.Database;
+@using MonkeyShop.Models;
+@using static MonkeyShop.Models.Database;
 @using MongoDB.Bson;
 @using MongoDB.Driver;
-@using static HomelessAnimalsDiplom.Views.Advertisement.AdvertisementSettings;
-@using static HomelessAnimalsDiplom.Controllers.HomeController;
-@using static HomelessAnimalsDiplom.Views.Home.MainPageSettings;
+@using static MonkeyShop.Views.Advertisement.AdvertisementSettings;
+@using static MonkeyShop.Controllers.HomeController;
+@using static MonkeyShop.Views.Home.MainPageSettings;
 
 @code {
 
@@ -24,8 +23,8 @@
     [Parameter]
     public MainPageSettings MainPage { get; set; }
 
-    [Parameter]
-    public RecommendationsComponent RecommendationsComp { get; set; }
+    //[Parameter]
+    //public RecommendationsComponent RecommendationsComp { get; set; }
 
     [Parameter]
     public FavoritesComponent FavoritesComp { get; set; }
@@ -105,10 +104,10 @@
                 FavoritesComp.Update();
             }
 
-            if (RecommendationsComp != null)
-            {
-                RecommendationsComp.Update();
-            }
+            //if (RecommendationsComp != null)
+            //{
+            //    RecommendationsComp.Update();
+            //}
             
         }
     }

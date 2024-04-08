@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
-namespace HomelessAnimalsDiplom.Views.Home
+namespace MonkeyShop.Views.Home
 {
     public class SignUpModel : PageModel
     {

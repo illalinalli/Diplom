@@ -1,4 +1,4 @@
-namespace HomelessAnimalsDiplom.Models
+namespace MonkeyShop.Models
 {
     public class ErrorViewModel
     {

@@ -1,4 +1,4 @@
-using HomelessAnimalsDiplom.Models;
+using MonkeyShop.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.JSInterop;

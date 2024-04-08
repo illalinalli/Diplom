@@ -1,6 +1,6 @@
 ﻿using System.Text.Encodings.Web;
 
-namespace HomelessAnimalsDiplom.Models
+namespace MonkeyShop.Models
 {
     public static class Utils
     {

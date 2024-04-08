@@ -1,5 +1,5 @@
-﻿using HomelessAnimalsDiplom.Models;
-using HomelessAnimalsDiplom.Views.Home;
+﻿using MonkeyShop.Models;
+using MonkeyShop.Views.Home;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -8,9 +8,9 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Diagnostics;
 using System.Security.Claims;
-using static HomelessAnimalsDiplom.Models.Database;
+using static MonkeyShop.Models.Database;
 
-namespace HomelessAnimalsDiplom.Controllers
+namespace MonkeyShop.Controllers
 {
     public class HomeController : Controller
     {
