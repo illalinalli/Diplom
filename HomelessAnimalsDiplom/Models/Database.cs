@@ -11,7 +11,7 @@ namespace HomelessAnimalsDiplom.Models
         public static IMongoCollection<Item>? ItemCollection;
         public static IMongoCollection<Breed>? BreedCollection;
         public static IMongoCollection<AnimalType>? AnimalTypeCollection;
-        public static IMongoCollection<PropertyType>? PropertyTypeCollection;
+        public static IMongoCollection<PropertyType> PropertyTypeCollection;
         public static IMongoCollection<PropertyValue>? PropertyValueCollection;
         public static string GetHash(string password)
         {

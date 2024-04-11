@@ -7,6 +7,5 @@ namespace HomelessAnimalsDiplom.Models
         public ObjectId Id { get; set; }
         public string? Name { get; set; }
         public ObjectId PropTypeRef { get; set; }
-
     }
 }
