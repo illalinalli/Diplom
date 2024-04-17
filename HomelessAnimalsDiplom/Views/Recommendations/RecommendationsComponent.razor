@@ -6,6 +6,8 @@
 @using MongoDB.Driver;
 @using static Controllers.HomeController;
 @code {
+   
+
     public List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList();
     public List<Item> RecommendationItems = new();
     public static AdvertisementDetailComponent? AdvertisementDetail = new();
@@ -18,7 +20,7 @@
         if (CurUser == null || Items == null) return;
         if (CurUser.ViewingHistory == null) CurUser.ViewingHistory = new();
         RecommendationItems = GetRecommendations(CurUser, Items);
-
+        // ПРИМЕНИТЬ АЛГОРИТМ РЕК СИСТЕМЫ!
     }
 
     public bool IsWatchedItem(Item item)
