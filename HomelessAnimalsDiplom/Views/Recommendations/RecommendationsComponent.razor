@@ -5,6 +5,7 @@
 @using MongoDB.Bson;
 @using MongoDB.Driver;
 @using static Controllers.HomeController;
+@using static Models.ContentBasedFiltering;
 @code {
 
 
@@ -18,17 +19,15 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        //RecommendationItems = GetRecommendations(CurUser, Items);
         if (CurUser == null || Items == null) return;
         if (CurUser.ViewingHistory == null) CurUser.ViewingHistory = new();
         var user = CurUser;
-        //RecommendationItems = GetRecommendations(CurUser, Items);
-        // ПРИМЕНИТЬ АЛГОРИТМ РЕК СИСТЕМЫ!
         recomSystem.breeds = BreedCollection.Find(new BsonDocument()).ToList();
         recomSystem.items = Items;
-        recomSystem.users = UserCollection.Find(new BsonDocument()).ToList(); //
+        recomSystem.users = UserCollection.Find(new BsonDocument()).ToList();
         recomSystem.properties_values = PropertyValueCollection.Find(new BsonDocument()).ToList();
-        //recomSystem.GetRecommendations(CurUser, );
+        RecommendationItems = recomSystem.Recommend();
+
     }
 
     public bool IsWatchedItem(Item item)
@@ -219,7 +218,7 @@
                     </div>
                 </div>
             </div>
-            <AdvertisementDetailComponent @ref="AdvertisementDetail" RecommendationsComp="this" />
+            <AdvertisementDetailComponent @ref="@AdvertisementDetail" RecommendationsComp="this" />
         </div>
     }
 }

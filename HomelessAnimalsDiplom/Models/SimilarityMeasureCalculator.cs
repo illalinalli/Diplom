@@ -2,6 +2,11 @@
 {
     public static class SimilarityMeasureCalculator
     {
+        /// <summary>
+        /// Нормализованное Евклидово расстояние
+        /// </summary>
+        /// <param name="valuePairs"></param>
+        /// <returns></returns>
         public static double CalcEuclideanDistance(ValuePair[] valuePairs)
         {
             double result = 0;

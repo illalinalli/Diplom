@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Xml.Linq;
+using static HomelessAnimalsDiplom.Models.Breed;
 
 namespace HomelessAnimalsDiplom.Models
 {
@@ -16,15 +17,17 @@ namespace HomelessAnimalsDiplom.Models
         public string? LongDescription { get; set; }
         public ObjectId UserRef { get; set; }
         public DateTimeOffset? CreationDate { get; set; }
+        public string[]? Parents { get; set; }
 
-        
-        [BsonIgnore]
-        public string[] Parents { get; set; }
+        public int GetBreedNumber()
+        {
+            return BreedsNums[BreedRef];
+        }
 
-        protected Item()
+        public Item()
         {
             //Id = ObjectId.GenerateNewId();
-            Title = "";
+            
             Parents = new string[0];
         }
 

@@ -2,7 +2,7 @@
 using MongoDB.Driver;
 using NuGet.Packaging;
 using System.Text;
-
+using static HomelessAnimalsDiplom.Models.Breed;
 namespace HomelessAnimalsDiplom.Models
 {
     public class Database
@@ -45,9 +45,11 @@ namespace HomelessAnimalsDiplom.Models
             PropertyTypeCollection = DB.GetCollection<PropertyType>("PropertyType");
             PropertyValueCollection = DB.GetCollection<PropertyValue>("PropertyValue");
 
-            
+            SetBreedsNum();
+
             //HashPassword();
         }
+
 
         public static readonly ReplaceOptions ReplaceOptionsUpsert = new() { IsUpsert = true };
     }
