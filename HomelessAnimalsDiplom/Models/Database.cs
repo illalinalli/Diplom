@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using NuGet.Packaging;
 using System.Text;
 
 namespace HomelessAnimalsDiplom.Models
@@ -13,6 +14,8 @@ namespace HomelessAnimalsDiplom.Models
         public static IMongoCollection<AnimalType>? AnimalTypeCollection;
         public static IMongoCollection<PropertyType> PropertyTypeCollection;
         public static IMongoCollection<PropertyValue>? PropertyValueCollection;
+        
+        //public static List<Item>? PublicationLeafCollection;
         public static string GetHash(string password)
         {
             var sha = System.Security.Cryptography.SHA1.Create();
@@ -41,6 +44,8 @@ namespace HomelessAnimalsDiplom.Models
             AnimalTypeCollection = DB.GetCollection<AnimalType>("AnimalType");
             PropertyTypeCollection = DB.GetCollection<PropertyType>("PropertyType");
             PropertyValueCollection = DB.GetCollection<PropertyValue>("PropertyValue");
+
+            
             //HashPassword();
         }
 

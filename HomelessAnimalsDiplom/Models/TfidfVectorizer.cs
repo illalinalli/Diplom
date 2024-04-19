@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Amazon.Runtime.Internal.Transform;
+using System;
 
 namespace HomelessAnimalsDiplom.Models
 {
@@ -25,11 +26,11 @@ namespace HomelessAnimalsDiplom.Models
                 }
 
                 // Compute IDF (Inverse Document Frequency)
-                Dictionary<string, double> wordIdf = new Dictionary<string, double>();
+                //Dictionary<string, double> wordIdf = new Dictionary<string, double>();
                 foreach (var word in wordCount.Keys)
                 {
                     int docsWithWord = itemsFeatures.Count(doc => doc.Contains(word));
-                    double idf = Math.Log((double)itemsFeatures.Count / (1 + docsWithWord));
+                    double idf = Math.Log((double)itemsFeatures.Count / (docsWithWord)); // 1 +
                     wordIdf[word] = idf;
                 }
 
@@ -38,11 +39,11 @@ namespace HomelessAnimalsDiplom.Models
                 {
                     double tfidf = wordCount[word] * wordIdf[word];
                     tfidfVector.Add(tfidf);
+                    //wordIdf.Add(word, tfidf);
                 }
 
                 tfidfMatrix.Add(tfidfVector);
             }
-
             return tfidfMatrix;
         }
 

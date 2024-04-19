@@ -22,6 +22,12 @@
     public static List<PropertyValue> propertyValues = PropertyValueCollection.Find(new BsonDocument()).ToList();
     Dictionary<ObjectId, bool> checkedStates = new();
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        item.Id = ObjectId.GenerateNewId();
+    }
+
     private void HandleAnimalTypeChange(ChangeEventArgs args)
     {
         if (args.Value == null) return;

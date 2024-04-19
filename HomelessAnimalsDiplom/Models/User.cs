@@ -16,7 +16,7 @@ namespace HomelessAnimalsDiplom.Models
         public string? Password { get; set; }
         public string? Country { get; set; }
         public string? City { get; set; }
-        public List<ObjectId>? Favorites { get; set; } = new();
+        public List<ObjectId> Favorites { get; set; } = new();
         public List<HistoryItem>? ViewingHistory { get; set; } = new();
     }
 

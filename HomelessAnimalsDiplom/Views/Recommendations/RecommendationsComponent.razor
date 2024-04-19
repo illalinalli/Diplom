@@ -6,12 +6,14 @@
 @using MongoDB.Driver;
 @using static Controllers.HomeController;
 @code {
-   
+
 
     public List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList();
     public List<Item> RecommendationItems = new();
     public static AdvertisementDetailComponent? AdvertisementDetail = new();
     public static MainPageSettings MainPage = new();
+
+    public ContentBasedFiltering recomSystem = new();
 
     protected override void OnInitialized()
     {
@@ -19,8 +21,14 @@
         //RecommendationItems = GetRecommendations(CurUser, Items);
         if (CurUser == null || Items == null) return;
         if (CurUser.ViewingHistory == null) CurUser.ViewingHistory = new();
-        RecommendationItems = GetRecommendations(CurUser, Items);
+        var user = CurUser;
+        //RecommendationItems = GetRecommendations(CurUser, Items);
         // ПРИМЕНИТЬ АЛГОРИТМ РЕК СИСТЕМЫ!
+        recomSystem.breeds = BreedCollection.Find(new BsonDocument()).ToList();
+        recomSystem.items = Items;
+        recomSystem.users = UserCollection.Find(new BsonDocument()).ToList(); //
+        recomSystem.properties_values = PropertyValueCollection.Find(new BsonDocument()).ToList();
+        //recomSystem.GetRecommendations(CurUser, );
     }
 
     public bool IsWatchedItem(Item item)
@@ -142,6 +150,8 @@
 
     //    return similarity;
     //}
+
+   
 
     static double CalculateCosineSimilarity(Item publication, List<Item> userPublications)
     {
