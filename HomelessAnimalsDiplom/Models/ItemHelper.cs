@@ -4,11 +4,11 @@
     {
         //public static readonly Period[] Periods;
         public static double[,] BreedsSimilarity;
-
+        public static double[,] ColorsSimilarity;
         public const int MAX_BREED_DIFFERENCE = 4;
-       
         public const int MAX_TREE_PROXIMITY = 3; // уровни
-
+        public static double MAX_COLOR_DIFFERENCE { get; } = 2;
+        public static double MAX_SIZE_DIFFERENCE { get; } = 2;
         static ItemHelper()
         {
             BreedsSimilarity = new[,]
@@ -20,6 +20,71 @@
                 { 0, 0, 0, 0.1, 1, 0.6 }, // Нем овчарка
                 { 0, 0, 0, 0.2, 0.6, 1 }, // Другая (собака)
             };
+
+            ColorsSimilarity = new[,]
+            {
+                { 1, 0, 0.1, 0, 0, 0, 0 }, // white
+                { 0, 1, 0.3, 0, 0, 0, 0 }, // black
+                { 0.1, 0.3, 1, 0, 0, 0, 0.6 }, // gray
+                { 0, 0, 0, 1, 0.6, 0.5, 0 }, // рыжий
+                { 0, 0, 0, 0.6, 1, 0.3, 0 }, // brown
+                { 0, 0, 0, 0.5, 0.3, 1, 0 }, // бежевый
+                { 0, 0, 0.6, 0, 0, 0, 1 }, // blue
+            };
+        }
+        public static double GetSizesSimilarity(string size1, string size2)
+        {
+            // Здесь можно реализовать логику подсчета сходства размеров
+            // Например, использовать таблицу соответствия размеров или какую-то другую логику
+            // Возвращаем значение сходства в диапазоне [0, 1]
+        }
+        public static double GetColorsSimilarity(int[] colors1, int[] colors2)
+        {
+            double similarity = 0;
+
+            // Создаём и заполняем матрицу схожести пород
+            // (строки - цвета первого списка, столбцы - второго).
+            var similarityMatrix = new double[colors1.Length, colors2.Length];
+            var commonColors = new List<int[]>();
+            for (var i = 0; i < colors1.Length; i++)
+            {
+                for (var j = 0; j < colors2.Length; j++)
+                {
+                    similarityMatrix[i, j] =
+                        ColorsSimilarity[(int)colors1[i], colors2[j]];
+                    // Суммируем общее значение схожести.
+                    similarity += similarityMatrix[i, j];
+
+                    // Сохраняем координаты общих пород (схожесть = 1).
+                    if (Math.Abs(similarityMatrix[i, j] - 1) < 0.01)
+                    {
+                        commonColors.Add(new[] { i, j });
+                    }
+                }
+            }
+
+            // Дополняем до 1 те значения схожести, которые стоят
+            // на пересечении строк и столбцов общих цветов,
+            // увеличивая таким образом общую схожесть.
+            // То есть в таблице схожести должно быть
+            // (commonBreeds.Count * commonBreeds.Count) единиц.
+            for (var i = 0; i < commonColors.Count; i++)
+            {
+                for (var j = 0; j < commonColors.Count; j++)
+                {
+                    if (i != j)
+                    {
+                        similarity += 1 - similarityMatrix[commonColors[i][0],
+                                          commonColors[j][1]];
+                    }
+                }
+            }
+
+            // Получаем схожесть списков цветов как среднее арифметическое всех ячеек.
+            similarity /= colors1.Length * colors1.Length;
+
+            return similarity;
+
         }
 
         public static double GetBreedsSimilarity(int[] list1, int[] list2)
@@ -35,7 +100,7 @@
                 for (var j = 0; j < list2.Length; j++)
                 {
                     similarityMatrix[i, j] =
-                        BreedsSimilarity[(int)list1[i], (int)list2[j]];
+                        BreedsSimilarity[list1[i], list2[j]];
                     // Суммируем общее значение схожести.
                     similarity += similarityMatrix[i, j];
 

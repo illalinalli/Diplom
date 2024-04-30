@@ -9,13 +9,13 @@ namespace HomelessAnimalsDiplom.Models
     {
         public ObjectId Id { get; set; }
         public string Name { get; set; }
+        public ObjectId SizeRef { get; set; }
+        //public List<Breed> SubBreeds { get; set; } = new();
         public ObjectId AnimalTypeRef { get; set; }
 
         [BsonIgnore]
         public static Dictionary<ObjectId, int> BreedsNums { get; set; } = new();
 
-        //[BsonIgnore]
-        //public int Number { get; private set; }
         public static List<Breed> GetAllBreeds()
         {
             return BreedCollection.Find(new BsonDocument()).ToList();

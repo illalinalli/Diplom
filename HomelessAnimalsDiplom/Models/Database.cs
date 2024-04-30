@@ -1,8 +1,11 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using NuGet.Packaging;
+using Radzen;
+using System.Drawing;
 using System.Text;
 using static HomelessAnimalsDiplom.Models.Breed;
+using static HomelessAnimalsDiplom.Models.Item;
 namespace HomelessAnimalsDiplom.Models
 {
     public class Database
@@ -33,6 +36,36 @@ namespace HomelessAnimalsDiplom.Models
                 UserCollection?.ReplaceOne(filter, user, ReplaceOptionsUpsert);
             }
         }
+
+        void AddProps()
+        {
+            var allItems = ItemCollection.Find(new BsonDocument()).ToList();
+            var allPropValues = PropertyValueCollection.Find(new BsonDocument()).ToList();
+            var sex = ObjectId.Parse("658ab0418a4dcfd166a80344"); // db
+            var color = ObjectId.Parse("658ab0a38a4dcfd166a80346"); // db
+            foreach (var it in allItems)
+            {
+                foreach (var prop in it.Properties)
+                {
+                    var res = allPropValues.FirstOrDefault(x => x.Id == prop);
+                    var propVal = allPropValues.FirstOrDefault(x => x.Id == prop);
+                    if (propVal.PropTypeRef == sex)
+                    {
+                        it.Sex = res;
+                    }
+                    if (propVal.PropTypeRef == color)
+                    {
+                        it.Colors.Add(res);
+                    }
+                }
+                // создание фильтра для поиска существующей записи
+                var filter = Builders<Item>.Filter.Eq("_id", it.Id);
+
+                // выполнение операции upsert
+                ItemCollection?.ReplaceOneAsync(filter, it, ReplaceOptionsUpsert);
+            }
+         
+        }
         public Database()
         {
             var connectionString = "mongodb://localhost:27017";
@@ -46,7 +79,9 @@ namespace HomelessAnimalsDiplom.Models
             PropertyValueCollection = DB.GetCollection<PropertyValue>("PropertyValue");
 
             SetBreedsNum();
+            SetColorsNum();
 
+            //AddProps();
             //HashPassword();
         }
 
