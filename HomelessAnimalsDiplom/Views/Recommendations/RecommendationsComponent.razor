@@ -26,7 +26,7 @@
         recomSystem.properties_values = PropertyValueCollection.Find(new BsonDocument()).ToList();
         //RecommendationItems = recomSystem.Recommend();
         //var eclDist = recomSystem.EuclideanDistanceRecommend();
-        var simTree = recomSystem.TreeProximityRecommend();
+        RecommendationItems = recomSystem.TreeProximityRecommend();
     }
 
     public bool IsWatchedItem(Item item)

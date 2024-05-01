@@ -28,9 +28,47 @@ namespace HomelessAnimalsDiplom.Models
         [BsonIgnore]
         public static Dictionary<ObjectId, int> ColorsNums { get; set; } = new();
 
+        public AnimalType GetAnimalType()
+        {
+            var curBreed = GetBreed();
+            var allTypes = GetAnimalTypes();
+            var res = allTypes.FirstOrDefault(x => x.Id == curBreed.AnimalTypeRef);
+            return res;
+        }
+
+        public List<AnimalType> GetAnimalTypes()
+        {
+            return AnimalTypeCollection.Find(new BsonDocument()).ToList();
+        }
+        public List<Item> GetAllCats()
+        {
+            var allItems = ItemCollection.Find(new BsonDocument()).ToList();
+            var allBreeds = GetAllBreeds();
+            ObjectId catId = ObjectId.Parse("654c9b86b060976eb8527e54");
+            var onlyCatsBreeds = allBreeds.FindAll(x => x.AnimalTypeRef == catId);
+            List<Item> res = new();
+            allItems.ForEach(x => 
+            {
+                onlyCatsBreeds.ForEach(y => 
+                {
+                    if (x.BreedRef == y.Id)
+                    {
+                        res.Add(x);
+                    }
+                   
+                });
+            });
+            return res;
+        }
+
         public int GetBreedNumber()
         {
             return BreedsNums[BreedRef];
+        }
+        public Breed GetBreed()
+        {
+            var a = GetAllBreeds();
+            return a.FirstOrDefault(x => x.Id == BreedRef);
         }
 
         public PropertyValue GetBreedSize()

@@ -6,7 +6,7 @@
         public static double[,] BreedsSimilarity;
         public static double[,] ColorsSimilarity;
         public const int MAX_BREED_DIFFERENCE = 4;
-        public const int MAX_TREE_PROXIMITY = 3; // уровни
+        public const int MAX_TREE_PROXIMITY = 5; // уровни
         public static double MAX_COLOR_DIFFERENCE { get; } = 2;
         public static double MAX_SIZE_DIFFERENCE { get; } = 2;
         static ItemHelper()
@@ -34,9 +34,36 @@
         }
         public static double GetSizesSimilarity(string size1, string size2)
         {
-            // Здесь можно реализовать логику подсчета сходства размеров
-            // Например, использовать таблицу соответствия размеров или какую-то другую логику
-            // Возвращаем значение сходства в диапазоне [0, 1]
+            // Приведем размеры к нижнему регистру для удобства сравнения
+            size1 = size1.ToLower();
+            size2 = size2.ToLower();
+
+            // Проверяем сходство размеров
+            if (size1 == size2)
+            {
+                // Если размеры полностью совпадают
+                return 1.0;
+            }
+            else if ((size1 == "мелкий" && size2 == "средний") || (size1 == "средний" && size2 == "мелкий"))
+            {
+                // Если размеры отличаются на один уровень (мелкий и средний)
+                return 0.5;
+            }
+            else if ((size1 == "мелкий" && size2 == "крупный") || (size1 == "крупный" && size2 == "мелкий"))
+            {
+                // Если размеры отличаются на два уровня (мелкий и крупный)
+                return 0.2;
+            }
+            else if ((size1 == "средний" && size2 == "крупный") || (size1 == "крупный" && size2 == "средний"))
+            {
+                // Если размеры отличаются на один уровень (средний и крупный)
+                return 0.7;
+            }
+            else
+            {
+                // Если размеры полностью различны
+                return 0.0;
+            }
         }
         public static double GetColorsSimilarity(int[] colors1, int[] colors2)
         {

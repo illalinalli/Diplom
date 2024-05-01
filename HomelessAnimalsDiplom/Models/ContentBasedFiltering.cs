@@ -6,17 +6,7 @@ using MongoDB.Driver;
 
 namespace HomelessAnimalsDiplom.Models
 {
-    class Node
-    {
-        public string Name { get; set; }
-        public List<Node> Children { get; set; }
-
-        public Node(string name)
-        {
-            Name = name;
-            Children = new List<Node>();
-        }
-    }
+    
     public class ContentBasedFiltering
     {
         public List<Item> items;
@@ -28,12 +18,50 @@ namespace HomelessAnimalsDiplom.Models
         {
             return PropertyValueCollection.Find(new BsonDocument()).ToList();
         }
+        // Метод для получения родителей элемента из дерева
+        private List<string> GetParentsFromNode(Node node, Item item)
+        {
+            // Найдем узел в дереве, соответствующий породе элемента
+            Node breedNode = FindNodeInTree(node, item.GetBreed().Name);
+
+            // Получим список родителей элемента из дерева
+            List<string> parents = new List<string>();
+            while (breedNode != null && breedNode.Parent != null)
+            {
+                parents.Add(breedNode.Parent.Name);
+                breedNode = breedNode.Parent;
+            }
+
+            return parents;
+        }
+
+        // Метод для поиска узла в дереве по имени
+        private Node FindNodeInTree(Node node, string name)
+        {
+            if (node.Name == name)
+            {
+                return node;
+            }
+
+            foreach (var child in node.Children)
+            {
+                var foundNode = FindNodeInTree(child, name);
+                if (foundNode != null)
+                {
+                    return foundNode;
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Только близость по дереву
         /// </summary>
         /// <returns></returns>
         public List<Item> TreeProximityRecommend()
         {
+            var tree = new TreeBuilder();
             var a = CurUser;
             // Получаем предпочтения текущего пользователя.
             var currentFavorites = items.Where(item => CurUser.Favorites.Contains(item.Id));
@@ -45,7 +73,7 @@ namespace HomelessAnimalsDiplom.Models
             items = items.Where(item =>
                     currentFavorites.All(favorite => favorite.Id != item.Id))
                 .ToList();
-
+           var node = tree.BuildTree(ItemCollection.Find(new BsonDocument()).ToList());
             // Создаём матрицу схожести публикаций (по породам) (строки - избранное
             // текущего пользователя, столбцы - все публикации, исключая избранное).
             var similarityMatrix =
@@ -55,15 +83,12 @@ namespace HomelessAnimalsDiplom.Models
                 for (var j = 0; j < similarityMatrix.GetLength(1); j++)
                 {
                     var pairs = BuildValuePairs(favoriteItems[i], items[j]);
-
-                    //var euclideanDistance = SimilarityMeasureCalculator.CalcEuclideanDistance(pairs); // для построения дерева близостей
-
-                    double treeProximity = SimilarityMeasureCalculator.CalcTreeProximity(favoriteItems[i].Parents, items[j].Parents);
-
-                    // Используем евклидово расстояние (составляет 70% в итоговом значении)
-                    // и близость по дереву (30%) для получения итогового сходства пород.
-                    similarityMatrix[i, j] = (1 - treeProximity / ItemHelper.MAX_TREE_PROXIMITY);
-                        ; // +  * 0.3
+                    var parentsItem1 = GetParentsFromNode(node, favoriteItems[i]);
+                    var parentsItem2 = GetParentsFromNode(node, items[j]);
+                    double treeProximity = SimilarityMeasureCalculator.CalcTreeProximity(parentsItem1.ToArray(), parentsItem2.ToArray(), favoriteItems[i], items[j]);
+                    
+                    // близость по дереву для получения итогового сходства пород.
+                    similarityMatrix[i, j] = treeProximity; // (1 - treeProximity / ItemHelper.MAX_TREE_PROXIMITY)
                 }
             }
 
@@ -87,7 +112,7 @@ namespace HomelessAnimalsDiplom.Models
 
             // Отбираем те породы, сходство которых больше 40%, и сортируем их по убыванию.
             var recommendedIds = itemsSimilarity
-                .Where(itemSimilarity => itemSimilarity.Value > 0.48)
+                .Where(itemSimilarity => itemSimilarity.Value > 0.6)
                 .OrderByDescending(itemSimilarity =>
                     itemSimilarity.Value)
                 .Select(itemSimilarity => itemSimilarity.Key);
@@ -277,9 +302,9 @@ namespace HomelessAnimalsDiplom.Models
                 new ValuePair(1,
                         ItemHelper.GetColorsSimilarity(colorsNum1.ToArray(), colorsNum2.ToArray()),
                         ItemHelper.MAX_COLOR_DIFFERENCE),
-                //new ValuePair(1,
-                //        ItemHelper.GetSizesSimilarity(size1, size2),
-                //        ItemHelper.MAX_SIZE_DIFFERENCE)
+                new ValuePair(1,
+                        ItemHelper.GetSizesSimilarity(size1.Name, size2.Name),
+                        ItemHelper.MAX_SIZE_DIFFERENCE)
             //new ValuePair()
             //{
 
