@@ -22,7 +22,7 @@ namespace HomelessAnimalsDiplom.Models
         private List<string> GetParentsFromNode(Node node, Item item)
         {
             // Найдем узел в дереве, соответствующий породе элемента
-            Node breedNode = FindNodeInTree(node, item.GetBreed().Name);
+            Node breedNode = FindNodeInTree(node, item.GetBreed().Name, item);
 
             // Получим список родителей элемента из дерева
             List<string> parents = new List<string>();
@@ -35,17 +35,23 @@ namespace HomelessAnimalsDiplom.Models
             return parents;
         }
 
-        // Метод для поиска узла в дереве по имени
-        private Node FindNodeInTree(Node node, string name)
+        // Метод для поиска узла в дереве по item
+        private Node FindNodeInTree(Node node, string name, Item item)
         {
-            if (node.Name == name)
+            //if (node.Name == name)
+            //{
+            //    //return node;
+                
+            //}
+
+            if (node.Item != null && node.Item.Id == item.Id)
             {
                 return node;
             }
 
             foreach (var child in node.Children)
             {
-                var foundNode = FindNodeInTree(child, name);
+                var foundNode = FindNodeInTree(child, name, item);
                 if (foundNode != null)
                 {
                     return foundNode;
@@ -86,9 +92,9 @@ namespace HomelessAnimalsDiplom.Models
                     var parentsItem1 = GetParentsFromNode(node, favoriteItems[i]);
                     var parentsItem2 = GetParentsFromNode(node, items[j]);
                     double treeProximity = SimilarityMeasureCalculator.CalcTreeProximity(parentsItem1.ToArray(), parentsItem2.ToArray(), favoriteItems[i], items[j]);
-                    
+
                     // близость по дереву для получения итогового сходства пород.
-                    similarityMatrix[i, j] = treeProximity; // (1 - treeProximity / ItemHelper.MAX_TREE_PROXIMITY)
+                    similarityMatrix[i, j] = treeProximity; //    (1 - treeProximity / ItemHelper.MAX_TREE_PROXIMITY)
                 }
             }
 
@@ -112,7 +118,7 @@ namespace HomelessAnimalsDiplom.Models
 
             // Отбираем те породы, сходство которых больше 40%, и сортируем их по убыванию.
             var recommendedIds = itemsSimilarity
-                .Where(itemSimilarity => itemSimilarity.Value > 0.6)
+                .Where(itemSimilarity => itemSimilarity.Value > 0.5)
                 .OrderByDescending(itemSimilarity =>
                     itemSimilarity.Value)
                 .Select(itemSimilarity => itemSimilarity.Key);
@@ -186,7 +192,7 @@ namespace HomelessAnimalsDiplom.Models
 
             // Отбираем те породы, сходство которых больше 40%, и сортируем их по убыванию.
             var recommendedIds = itemsSimilarity
-                .Where(itemSimilarity => itemSimilarity.Value > 0.48)
+                .Where(itemSimilarity => itemSimilarity.Value > 0.7)
                 .OrderByDescending(itemSimilarity =>
                     itemSimilarity.Value)
                 .Select(itemSimilarity => itemSimilarity.Key);

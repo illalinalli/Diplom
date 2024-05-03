@@ -43,22 +43,27 @@ namespace HomelessAnimalsDiplom.Models
                 Node typeNode = animalType.Name == "Кот" ? catsNode : dogsNode;
 
                 // Разделение по размеру
-                Node sizeNode = FindOrCreateChild(typeNode, item.GetBreedSize().Name);
+                Node sizeNode = FindOrCreateChild(typeNode, item.GetBreedSize().Name, item);
                 SetParentReferences(sizeNode, typeNode);
                 // Разделение по окрасу
-                Node colorsNode = FindOrCreateChild(sizeNode, "Окрас");
-                SetParentReferences(colorsNode, sizeNode);
-
-                foreach (var color in item.Colors)
-                {
-                    Node colorNode = FindOrCreateChild(colorsNode, color.Name);
-                    SetParentReferences(colorNode, colorsNode);
-                    // Разделение по породе
-                    Node breedNode = FindOrCreateChild(colorNode, item.GetBreed().Name);
-                    SetParentReferences(breedNode, colorNode);
-                    // Добавление элемента в соответствующий узел
-                    breedNode.Children.Add(new Node(item.Title));
-                }
+                //Node colorsNode = FindOrCreateChild(sizeNode, "Окрас");
+                //SetParentReferences(colorsNode, sizeNode);
+                Node breedNode = FindOrCreateChild(sizeNode, item.GetBreed().Name, item);
+                SetParentReferences(breedNode, sizeNode);
+                breedNode.Children.Add(new Node(item, item.Title, breedNode));
+                //foreach (var color in item.Colors)
+                //{
+                //   // Node colorNode = FindOrCreateChild(sizeNode, color.Name);
+                //    //SetParentReferences(colorNode, sizeNode);
+                //    // Разделение по породе
+                //    //Node breedNode = FindOrCreateChild(sizeNode, item.GetBreed().Name, item);
+                //    //SetParentReferences(breedNode, sizeNode);
+                //    //Node colorNode = FindOrCreateChild(breedNode, color.Name, item);
+                //    //SetParentReferences(colorNode, breedNode);
+                //    // Добавление элемента в соответствующий узел
+                //    //breedNode.Children.Add(new Node(item.Title));
+                //    //colorNode.Children.Add(new Node(item, item.Title));
+                //}
             }
 
             return root;
@@ -71,8 +76,13 @@ namespace HomelessAnimalsDiplom.Models
                 SetParentReferences(child, node);
             }
         }
-        private Node FindOrCreateChild(Node parent, string name)
+        private Node FindOrCreateChild(Node parent, string name, Item item)
         {
+            //var childItem = parent.Children.Find(c => c.Item == item);
+            //Node child = new();
+            //if (childItem == null)
+            //{
+            //}
             var child = parent.Children.Find(c => c.Name == name);
             if (child == null)
             {

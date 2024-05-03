@@ -130,10 +130,10 @@ namespace HomelessAnimalsDiplom.Models
             }
 
             var commonParents = parentList1.Zip(parentList2, (p1, p2) => p1 == p2).Count(c => c);
-
+            if (commonParents > 1) commonParents--;
             result += commonParents;
-
-            result /= commonDepth; // 2 * 
+            result /= commonDepth;
+            //result = 1 - result; // 2 * 
             return result;
         }
         //private static double GetSizeSimilarity(string[] parentList1, string[] parentList2)
