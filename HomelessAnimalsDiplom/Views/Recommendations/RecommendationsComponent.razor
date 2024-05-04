@@ -24,8 +24,8 @@
         recomSystem.items = Items;
         recomSystem.users = UserCollection.Find(new BsonDocument()).ToList();
         recomSystem.properties_values = PropertyValueCollection.Find(new BsonDocument()).ToList();
-        //RecommendationItems = recomSystem.Recommend();
-        RecommendationItems = recomSystem.TreeProximityRecommend();
+        RecommendationItems = recomSystem.Recommend();
+        //RecommendationItems = recomSystem.TreeProximityRecommend();
         //RecommendationItems = recomSystem.EuclideanDistanceRecommend(); //recomSystem.TreeProximityRecommend();
     }
 

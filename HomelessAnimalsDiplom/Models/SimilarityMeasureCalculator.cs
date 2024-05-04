@@ -126,7 +126,7 @@ namespace HomelessAnimalsDiplom.Models
             {
                 var sizeSimilarity = GetSizesSimilarity(item1, item2);
                 double colorsSimilarity = GetColorsSimilarity(item1, item2);
-                result = 0.7 * sizeSimilarity + 0.5 * colorsSimilarity; // 0.5 * 
+                result = 0.6 * sizeSimilarity + 0.4 * colorsSimilarity; // 0.5 * 
             }
 
             var commonParents = parentList1.Zip(parentList2, (p1, p2) => p1 == p2).Count(c => c);
