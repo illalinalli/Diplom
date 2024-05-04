@@ -5,7 +5,6 @@
 @using MongoDB.Driver;
 @using System.IO;
 @code {
-        //public static readonly ReplaceOptions ReplaceOptionsUpsert = new ReplaceOptions() { IsUpsert = true };
     private ObjectId selectedAnimalType;
     private ObjectId selectedBreed;
     Item item = new();
@@ -14,24 +13,24 @@
     List<Breed> breeds = new();
     List<ObjectId> properties = new();
     List<PropertyValue> colors = new();
-    //PropertyValue sex = new();
-    ObjectId sex = ObjectId.Empty;
-    ObjectId color = ObjectId.Empty;
+
     string? title;
     string? longText;
     List<byte[]> photos = new();
 
     List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
-    public static List<PropertyType> propertyTypes = PropertyTypeCollection.Find(new BsonDocument()).ToList();
-    public static List<PropertyValue> propertyValues = PropertyValueCollection.Find(new BsonDocument()).ToList();
+
     Dictionary<ObjectId, bool> checkedStates = new();
+
+    List<PropertyValue> AllColors = new();
+    List<PropertyValue> AllSexes = new();
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         item.Id = ObjectId.GenerateNewId();
-        sex = ObjectId.Parse("658ab0418a4dcfd166a80344"); // db
-        color = ObjectId.Parse("658ab0a38a4dcfd166a80346"); // db
+        AllColors = Item.GetAllColors();
+        AllSexes = Item.GetAllSexes();
     }
 
     private void HandleAnimalTypeChange(ChangeEventArgs args)
@@ -39,7 +38,6 @@
         if (args.Value == null) return;
 
         animalType.Id = ObjectId.Parse(args.Value.ToString());
-        //selectedAnimalType = ObjectId.Parse(args.Value.ToString());
 
         if (animalType.Id != ObjectId.Empty)
         {
@@ -88,32 +86,32 @@
         return checkedStates.ContainsKey(id) && checkedStates[id];
     }
 
-
-    void HandleCheck(ChangeEventArgs e, PropertyValue ptVal)
+    void HandleCheckColors(ChangeEventArgs e, PropertyValue ptVal)
     {
         if (e.Value == null) return;
         var isChecked = (bool)e.Value;
 
-        if (ptVal.PropTypeRef == sex)
+        if (isChecked)
         {
-            item.Sex = ptVal;
+            colors.Add(ptVal);
         }
-        if (ptVal.PropTypeRef == color)
+        else
         {
-            if (isChecked)
-            {
-                colors.Add(ptVal);
-            }
-            else
-            {
-                colors.Remove(ptVal);
-            }
-            
+            colors.Remove(ptVal);
         }
+
         checkedStates[ptVal.Id] = isChecked;
         StateHasChanged();
     }
 
+    void HandleCheckSex(ChangeEventArgs e, PropertyValue ptVal)
+    {
+        if (e.Value == null) return;
+
+        item.Sex = ptVal;
+
+        StateHasChanged();
+    }
     void GetTitle(ChangeEventArgs e)
     {
         title = e?.Value?.ToString();
@@ -151,16 +149,16 @@
         }
     }
 
-    // сделать проверку на валидность полей!!!!
+
     void Save()
     {
-        //item.Properties = properties;
-
+        if (CurUser == null) return;
         if (breed.Id == ObjectId.Empty)
         {
             breed.Id = breeds.OrderBy(x => x.Name).First().Id;
         }
         item.BreedRef = breed.Id;
+        item.Colors = colors;
         item.IsPublished = true;
         item.UserRef = CurUser.Id;
         item.Title = title;
@@ -217,31 +215,34 @@
                                 <option value="@b.Id">@b.Name</option>
                             }
                         }
-                        @*@if (selectedBreedId == ObjectId.Empty && breeds.Count != 0)
-                        {
-                            selectedBreedId = breeds.OrderBy(x => x.Name).FirstOrDefault().Id;
-                        }*@
                     </select>
                 </div>
             </div>
         </div>
         <div class="col-12">
             <div class="row mb-3">
-                @foreach (var t in propertyTypes)
-                {
-                    var labelName = t.Name + ":";
-                    <label class="col-form-label col-lg-4 col-xxl-2" for="@t.Id">@labelName</label>
-                    <div class="col-lg-9">
-                        @foreach (var v in propertyValues.FindAll(x => x.PropTypeRef == t.Id))
-                        {
-                            <div class="mb-1">
-                                <input class="form-check-input" type="checkbox" name="radios" id="@v.Id" value="@v.Name"
-                                checked="@IsChecked(v.Id)" @onchange="e => HandleCheck(e, v)">
-                                <label class="form-check-label" for="@v.Id">@v.Name</label>
-                            </div>
-                        }
-                    </div>
-                }
+                <label class="col-form-label col-lg-4 col-xxl-2">Пол животного</label>
+                <div class="col-lg-9 mb-2">
+                    @foreach (var s in AllSexes)
+                    {
+                        <div class="mb-1">
+                            <input class="form-check-input" type="radio" name="radios" id="@s.Id" 
+                               checked="@IsChecked(s.Id)" @onchange="e => HandleCheckSex(e, s)">
+                            <label class="form-check-label" for="@s.Id">@s.Name</label>
+                        </div>
+                    }
+                </div>
+                <label class="col-form-label col-lg-4 col-xxl-2">Окрас животного</label>
+                <div class="col-lg-9 mb-2">
+                    @foreach (var s in AllColors)
+                    {
+                        <div class="mb-1">
+                            <input class="form-check-input" type="checkbox" name="boxes" id="@s.Id" value="@s.Name"
+                               checked="@IsChecked(s.Id)" @onchange="e => HandleCheckColors(e, s)">
+                            <label class="form-check-label" for="@s.Id">@s.Name</label>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
         <div class="col-12">

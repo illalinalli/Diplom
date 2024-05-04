@@ -218,9 +218,8 @@ namespace HomelessAnimalsDiplom.Models
                 items.Find(item => item.Id == favorite.Id)).ToList();
 
             // Исключаем избранные публикации текущего пользователя.
-            items = items.Where(item =>
-                    currentFavorites.All(favorite => favorite.Id != item.Id))
-                .ToList();
+            items = items.Where(item => currentFavorites.All(favorite => favorite.Id != item.Id) 
+                    && item.UserRef != CurUser.Id).ToList();
             var node = tree.BuildTree(ItemCollection.Find(new BsonDocument()).ToList());
             // Создаём матрицу схожести публикаций (по породам) (строки - избранное
             // текущего пользователя, столбцы - все публикации, исключая избранное).

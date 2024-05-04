@@ -88,13 +88,21 @@ namespace HomelessAnimalsDiplom.Models
         {
             return PropertyValueCollection.Find(new BsonDocument()).ToList();
         }
-        public static List<PropertyValue> GetColors()
+        public static List<PropertyValue> GetAllSexes()
         {
-            return PropertyValueCollection.Find(new BsonDocument()).ToList().FindAll(x => x.PropTypeRef == ObjectId.Parse("658ab0a38a4dcfd166a80346"));
+            var sex = PropertyTypeCollection.Find(s => s.Name == "Пол животного").FirstOrDefault();
+            if (sex == null) return null;
+            return PropertyValueCollection.Find(new BsonDocument()).ToList().FindAll(x => x.PropTypeRef == sex.Id);
+        }
+        public static List<PropertyValue> GetAllColors()
+        {
+            var color = PropertyTypeCollection.Find(c => c.Name == "Окрас животного").FirstOrDefault();
+            if (color == null) return null;
+            return PropertyValueCollection.Find(new BsonDocument()).ToList().FindAll(x => x.PropTypeRef == color.Id);
         }
         public static void SetColorsNum()
         {
-            var allPropertyValues = GetColors();
+            var allPropertyValues = GetAllColors();
             int num = 0;
             foreach (var pt in allPropertyValues)
             {

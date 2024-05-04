@@ -21,6 +21,14 @@
     public static List<Breed> breeds = new();
     public static PropertyValue propertyValue = new();
 
+    List<PropertyValue> AllColors = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        AllColors = Item.GetAllColors();
+    }
+
     void AnimalTypeChanged(ObjectId id)
     {
         animalType = AnimalTypeCollection.Find(x => x.Id == id).FirstOrDefault();
@@ -48,7 +56,7 @@
 
     void ColorChanged(ObjectId id)
     {
-        propertyValue = propertyValues.FirstOrDefault(x => x.Id == id);
+        //propertyValue = propertyValues.FirstOrDefault(x => x.Id == id);
         selectedColorValue = propertyValue.Name;
         StateHasChanged();
     }
@@ -92,7 +100,7 @@
                             @selectedColorValue
                         </button>
                         <ul class="dropdown-menu">
-                            @foreach (var c in propertyValues.FindAll(x => x.PropTypeRef == new ObjectId("658ab0a38a4dcfd166a80346")).OrderBy(x => x.Name))
+                            @foreach (var c in AllColors.OrderBy(x => x.Name))
                             {
                             // href="/Search/SearchView"
                                 <li class="dropdown-item" value="@c.Id" style="font-size: small; width: 150px;" @onclick="@(e => ColorChanged(@c.Id))">@c.Name</li>

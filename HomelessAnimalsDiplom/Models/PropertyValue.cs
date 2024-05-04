@@ -14,5 +14,10 @@ namespace HomelessAnimalsDiplom.Models
         {
             return ColorsNums[Id];
         }
+
+        public void GetAllColors(PropertyType color)
+        {
+
+        }
     }
 }

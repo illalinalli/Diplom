@@ -57,11 +57,11 @@
             }
             isFavorite = CurUser.Favorites.Any(x => x == selectedItem.Id);
         }
-        properties = new();
-        foreach (var p in item.Properties)
-        {
-            properties.Add(propertyValues.FirstOrDefault(x => x.Id == p));
-        }
+        //properties = new();
+        //foreach (var p in item.Properties)
+        //{
+        //    properties.Add(propertyValues.FirstOrDefault(x => x.Id == p));
+        //}
         StateHasChanged();
     }
 

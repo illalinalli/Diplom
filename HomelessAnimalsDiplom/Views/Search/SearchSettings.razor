@@ -48,7 +48,7 @@
     void ColorChanged(ObjectId id)
     {
         propertyValue.Id = id;
-        selectedColorValue = propertyValues.FirstOrDefault(x => x.Id == id).Name;
+        //selectedColorValue = propertyValues.FirstOrDefault(x => x.Id == id).Name;
         StateHasChanged();
     }
     protected override async Task OnInitializedAsync()
@@ -169,7 +169,7 @@
                             @selectedColorValue
                         </button>
                         <ul class="dropdown-menu">
-                            @foreach (var c in propertyValues.FindAll(x => x.PropTypeRef == new ObjectId("658ab0a38a4dcfd166a80346")).OrderBy(x => x.Name))
+                            @foreach (var c in Item.GetAllColors().OrderBy(x => x.Name))
                             {
                             // href="/Search/SearchView"
                                 <li class="dropdown-item" value="@c.Id" style="font-size: small; width: 150px;" @onclick="@(e => ColorChanged(@c.Id))">@c.Name</li>

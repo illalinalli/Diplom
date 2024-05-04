@@ -75,52 +75,8 @@ namespace HomelessAnimalsDiplom.Models
                 throw new ArgumentNullException(nameof(parentList2));
             }
 
-            //var result = parentList1.Length + parentList2.Length;
-            //var commonParents = 0;
-            //var commonDepth = Math.Min(parentList1.Length, parentList2.Length);
-            //while (commonParents < commonDepth
-            //       && parentList1[commonParents] == parentList2[commonParents])
-            //{
-            //    commonParents++;
-            //}
-
-            //// Вычисляем сходство по размерам
-
-            //// Вычисляем сходство по окрасам
-
-            //result -= commonParents * 2;
-            //result++;
-
             double result = 0.0;
             var commonDepth = Math.Min(parentList1.Length, parentList2.Length);
-
-            //if (item1 != null && item2 != null)
-            //{
-            //    // Вычисляем сходство по размерам
-            //    var sizeSimilarity = GetSizesSimilarity(item1, item2);
-            //    result += sizeSimilarity;
-
-            //    // Вычисляем сходство по окрасам
-            //    var colorsSimilarity = GetColorsSimilarity(item1, item2);
-            //    result += (int)colorsSimilarity;
-
-            //}
-
-            //// Вычисляем общих родителей
-            //var commonParents = 0;
-            //for (var i = 0; i < commonDepth; i++)
-            //{
-            //    if (parentList1[i] == parentList2[i])
-            //    {
-            //        commonParents++;
-            //    }
-            //}
-            //result += commonParents;
-            ////result -= commonParents * 2;
-            ////result++;
-            //// Нормализуем результат
-            //result /= (3 * commonDepth);
-            //var a = (int)result;
            
             if (item1 != null && item2 != null)
             {
@@ -133,30 +89,10 @@ namespace HomelessAnimalsDiplom.Models
             if (commonParents > 1) commonParents--;
             result += commonParents;
             result /= commonDepth;
-            //result = 1 - result; // 2 * 
+
             return result;
         }
-        //private static double GetSizeSimilarity(string[] parentList1, string[] parentList2)
-        //{
-        //    // Реализуйте логику вычисления сходства размеров
-        //    // Возвращает значение от 0 до 1, где 0 - нет сходства, 1 - полное сходство
-        //    // Пример:
-        //    var size1 = GetSizeFromParentList(parentList1);
-        //    var size2 = GetSizeFromParentList(parentList2);
-        //    return size1 == size2 ? 1.0 : 0.0;
-        //}
-
-        //double GetColorsSimilarity(string[] parentList1, string[] parentList2)
-        //{
-        //    // Реализуйте логику вычисления сходства окрасов
-        //    // Возвращает значение от 0 до 1, где 0 - нет сходства, 1 - полное сходство
-        //    // Пример:
-        //    var colors1 = GetColorsFromParentList(parentList1);
-        //    var colors2 = GetColorsFromParentList(parentList2);
-        //    var commonColors = colors1.Intersect(colors2).Count();
-        //    var totalColors = colors1.Count() + colors2.Count();
-        //    return (double)commonColors / totalColors;
-        //}
+        
         public static double CalcCorrelation(ValuePair[] valuePairs)
         {
             double firstMedium = valuePairs.Sum(pair => pair.First) / valuePairs.Length;
