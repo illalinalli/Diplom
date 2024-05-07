@@ -17,7 +17,8 @@ namespace HomelessAnimalsDiplom.Models
         public static IMongoCollection<AnimalType>? AnimalTypeCollection;
         public static IMongoCollection<PropertyType> PropertyTypeCollection;
         public static IMongoCollection<PropertyValue>? PropertyValueCollection;
-        
+        public static IMongoCollection<Similarity>? SimilarityCollection;
+
         //public static List<Item>? PublicationLeafCollection;
         public static string GetHash(string password)
         {
@@ -37,35 +38,35 @@ namespace HomelessAnimalsDiplom.Models
             }
         }
 
-        void AddProps()
-        {
-            var allItems = ItemCollection.Find(new BsonDocument()).ToList();
-            var allPropValues = PropertyValueCollection.Find(new BsonDocument()).ToList();
-            var sex = ObjectId.Parse("658ab0418a4dcfd166a80344"); // db
-            var color = ObjectId.Parse("658ab0a38a4dcfd166a80346"); // db
-            foreach (var it in allItems)
-            {
-                foreach (var prop in it.Properties)
-                {
-                    var res = allPropValues.FirstOrDefault(x => x.Id == prop);
-                    var propVal = allPropValues.FirstOrDefault(x => x.Id == prop);
-                    if (propVal.PropTypeRef == sex)
-                    {
-                        it.Sex = res;
-                    }
-                    if (propVal.PropTypeRef == color)
-                    {
-                        it.Colors.Add(res);
-                    }
-                }
-                // создание фильтра для поиска существующей записи
-                var filter = Builders<Item>.Filter.Eq("_id", it.Id);
+        //void AddProps()
+        //{
+        //    var allItems = ItemCollection.Find(new BsonDocument()).ToList();
+        //    var allPropValues = PropertyValueCollection.Find(new BsonDocument()).ToList();
+        //    var sex = ObjectId.Parse("658ab0418a4dcfd166a80344"); // db
+        //    var color = ObjectId.Parse("658ab0a38a4dcfd166a80346"); // db
+        //    foreach (var it in allItems)
+        //    {
+        //        foreach (var prop in it.Properties)
+        //        {
+        //            var res = allPropValues.FirstOrDefault(x => x.Id == prop);
+        //            var propVal = allPropValues.FirstOrDefault(x => x.Id == prop);
+        //            if (propVal.PropTypeRef == sex)
+        //            {
+        //                it.Sex = res;
+        //            }
+        //            if (propVal.PropTypeRef == color)
+        //            {
+        //                it.Colors.Add(res);
+        //            }
+        //        }
+        //        // создание фильтра для поиска существующей записи
+        //        var filter = Builders<Item>.Filter.Eq("_id", it.Id);
 
-                // выполнение операции upsert
-                ItemCollection?.ReplaceOneAsync(filter, it, ReplaceOptionsUpsert);
-            }
+        //        // выполнение операции upsert
+        //        ItemCollection?.ReplaceOneAsync(filter, it, ReplaceOptionsUpsert);
+        //    }
          
-        }
+        //}
         public Database()
         {
             var connectionString = "mongodb://localhost:27017";
@@ -77,7 +78,7 @@ namespace HomelessAnimalsDiplom.Models
             AnimalTypeCollection = DB.GetCollection<AnimalType>("AnimalType");
             PropertyTypeCollection = DB.GetCollection<PropertyType>("PropertyType");
             PropertyValueCollection = DB.GetCollection<PropertyValue>("PropertyValue");
-
+            SimilarityCollection = DB.GetCollection<Similarity>("Similarity");
             SetBreedsNum();
             SetColorsNum();
 

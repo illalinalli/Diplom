@@ -80,7 +80,7 @@ namespace HomelessAnimalsDiplom.Models
             if (size == null) return null;
             return size;
         }
-        List<Breed> GetAllBreeds()
+       public static List<Breed> GetAllBreeds()
         {
             return BreedCollection.Find(new BsonDocument()).ToList();
         }

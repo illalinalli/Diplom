@@ -1,4 +1,12 @@
-﻿@model User
+﻿@using HomelessAnimalsDiplom.Views.Shared.Components;
+@using HomelessAnimalsDiplom.Controllers;
+@using MongoDB.Bson;
+@using MongoDB.Driver;
+@model User
+@{
+
+    Layout = "~/Views/Shared/_Layout01.cshtml";
+}
 @section Attic {
     <component type="typeof(HomelessAnimalsDiplom.Views.Advertisement.AdvertisementSettings)"
     render-mode="Server" />

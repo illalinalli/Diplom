@@ -1,5 +1,8 @@
-﻿body {
-}
+﻿/** h3, div {
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    text-align: center !important;
+}*/
 
 .carousel {
     display: flex;
@@ -71,3 +74,9 @@
 /*.card {
     width: 24rem !important;
 }*/
+
+.ad-text {
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    text-align: center !important;
+}

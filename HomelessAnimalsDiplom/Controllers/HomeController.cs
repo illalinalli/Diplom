@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using static HomelessAnimalsDiplom.Models.Database;
 
@@ -40,6 +41,11 @@ namespace HomelessAnimalsDiplom.Controllers
             return View("FavoritesPage");
         }
 
+        public IActionResult AdminPage()
+        {
+            return View("AdminPage");
+        }
+
         [HttpPost]
         public async Task<IActionResult> Login(string Login, string Password)
         {
@@ -65,8 +71,14 @@ namespace HomelessAnimalsDiplom.Controllers
                             IsPersistent = true
                         };
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProps);
-                        
-                        return RedirectToAction("MainPage", "Home");
+                        if (user.IsAdmin)
+                        {
+                            return RedirectToAction("AdminPage", "Home");
+                        }
+                        else
+                        {
+                            return RedirectToAction("MainPage", "Home");
+                        }
                     }
                     else
                     {

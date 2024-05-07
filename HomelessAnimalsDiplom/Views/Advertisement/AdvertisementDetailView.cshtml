@@ -1,2 +1,10 @@
-﻿<component type="typeof(HomelessAnimalsDiplom.Views.Advertisement.AdvertisementDetailComponent)"
+﻿@using HomelessAnimalsDiplom.Views.Shared.Components;
+@using HomelessAnimalsDiplom.Controllers;
+@using MongoDB.Bson;
+@using MongoDB.Driver;
+@{
+
+    Layout = "~/Views/Shared/_Layout01.cshtml";
+}
+<component type="typeof(HomelessAnimalsDiplom.Views.Advertisement.AdvertisementDetailComponent)"
            render-mode="Server" />

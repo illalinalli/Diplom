@@ -18,6 +18,8 @@ namespace HomelessAnimalsDiplom.Models
         public string? City { get; set; }
         public List<ObjectId> Favorites { get; set; } = new();
         public List<HistoryItem>? ViewingHistory { get; set; } = new();
+
+        public bool IsAdmin { get; set; }
     }
 
 }
