@@ -35,17 +35,17 @@ namespace HomelessAnimalsDiplom.Views.Home
             Password = string.Empty;
         }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            if (ModelState.IsValid)
-            {
-                //var result = await UserManager.Login(Login, Password, HttpContext);
-                //if (result.Success)
-                //    return Redirect(ReturnUrl ?? "/");
+        //public async Task<IActionResult> OnPostAsync()
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        //var result = await UserManager.Login(Login, Password, HttpContext);
+        //        //if (result.Success)
+        //        //    return Redirect(ReturnUrl ?? "/");
 
-                //ModelState.AddModelError("", result.ErrorMessage);
-            }
-            return Page();
-        }
+        //        //ModelState.AddModelError("", result.ErrorMessage);
+        //    }
+        //    return Page();
+        //}
     }
 }

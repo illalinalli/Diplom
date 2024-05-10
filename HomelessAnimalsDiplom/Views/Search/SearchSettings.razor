@@ -51,8 +51,9 @@
         //selectedColorValue = propertyValues.FirstOrDefault(x => x.Id == id).Name;
         StateHasChanged();
     }
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
+        base.OnInitialized();
         FindItems();
     }
 

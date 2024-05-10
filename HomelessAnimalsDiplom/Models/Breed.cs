@@ -30,7 +30,6 @@ namespace HomelessAnimalsDiplom.Models
                 num++;
             }
         }
-
         public override string ToString()
         {
             return Name;

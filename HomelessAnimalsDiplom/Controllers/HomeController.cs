@@ -16,7 +16,6 @@ namespace HomelessAnimalsDiplom.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        //private SignInManager<User>? _signInManager;
         public static User? CurUser; 
         public HomeController(ILogger<HomeController> logger)
         {
@@ -43,7 +42,7 @@ namespace HomelessAnimalsDiplom.Controllers
 
         public IActionResult AdminPage()
         {
-            return View("AdminPage");
+            return View();
         }
 
         [HttpPost]

@@ -1,66 +1,105 @@
-﻿@using static Controllers.HomeController;
-@using HomelessAnimalsDiplom.Models;
+﻿@using static HomelessAnimalsDiplom.Controllers.HomeController;
 @using static HomelessAnimalsDiplom.Models.Database;
+@using HomelessAnimalsDiplom.Models;
 @using HomelessAnimalsDiplom.Views.Advertisement;
 @using MongoDB.Bson;
 @using MongoDB.Driver;
-@using static Controllers.HomeController;
 @code {
-    Similarity similarity = new Similarity();  // Создание экземпляра матрицы
-
+    public Similarity similarity;  // Создание экземпляра матрицы
+    public List<BreedSimilarity> breedsSimilarity;
     protected override void OnInitialized()
     {
         // Загрузка и заполнение матрицы из базы данных (если необходимо)
         // Пример:
-        similarity.SizeSimilarity = LoadMatrixFromDatabase();
+        //breedsMatrix = new();
+        breedsSimilarity = new();
+        var allBreeds = Item.GetAllBreeds();
+        //foreach (var b in allBreeds)
+        //{
+        //    BreedSimilarity breedSim = new()
+        //    {
+        //        AnimalBreed = b
+        //    };
+        //}
+        breedsSimilarity = BreedSimilarity.Fill();
+
+        //similarity = SimilarityCollection.Find(new BsonDocument()).FirstOrDefault();
+        //if (similarity == null)
+        //{
+        //    similarity = new();
+        //}
+        //similarity.BreedSimilarity = LoadMatrixFromDatabase();
+        //similarity.Fill();
     }
 
-    private void Save()
+    public void Save()
     {
-        similarity.SizesSimilarityUpdate(); // Вызов метода для сохранения данных в базе данных
-                                                  // Дополнительные действия при сохранении
+        try
+        {
+            foreach (var b in breedsSimilarity)
+            {
+                var filter = Builders<BreedSimilarity>.Filter.Eq("_id", b.Id);
+                BreedSimilarityCollection?.ReplaceOneAsync(filter, b, ReplaceOptionsUpsert).Wait();
+                
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
     }
 
     private Dictionary<Breed, Dictionary<Breed, double>> LoadMatrixFromDatabase()
     {
         // Логика загрузки данных из базы данных (может быть реализована с использованием Entity Framework или другого ORM)
         // Пример заполнения матрицы нулями:
-        Dictionary<Breed, Dictionary<Breed, double>> matrix = new Dictionary<Breed, Dictionary<Breed, double>>();
+
+        Dictionary<Breed, Dictionary<Breed, double>> breedsMatrix = new Dictionary<Breed, Dictionary<Breed, double>>();
         List<Breed> breeds = Item.GetAllBreeds(); // Функция для получения списка пород из базы данных
 
         foreach (var breed1 in breeds)
         {
-            matrix[breed1] = new Dictionary<Breed, double>();
+            breedsMatrix[breed1] = new Dictionary<Breed, double>();
             foreach (var breed2 in breeds)
             {
-                matrix[breed1][breed2] = 0.0; // Заполнение матрицы нулями
+                breedsMatrix[breed1][breed2] = 0.0; // Заполнение матрицы нулями
             }
         }
 
-        return matrix;
+        return breedsMatrix;
     }
-    private void OnInput(ChangeEventArgs e, Breed breed1, Breed breed2)
+
+    private async Task UpdateValue(Breed breed1, Breed breed2, ChangeEventArgs e)
     {
-        if (e.Value != null)
+        if (e.Value == null) return;
+        double value = 0.0;
+        var curRes = breedsSimilarity.FirstOrDefault(x => x.AnimalBreed == breed1);
+        if (curRes == null) return;
+        if (Double.TryParse(e.Value.ToString().Replace(".", ","), out value))
         {
-            double value = Convert.ToDouble(e.Value);
-            if (value > 1)
+            if (value >= 0 && value <= 1)
             {
-                value = 1;
+                await Task.Delay(1); // Заглушка для асинхронности
+                curRes.SimilarityValues[breed2] = value;
+                //similarity.BreedSimilarity[breed1][breed2] = value;
+                //similarity.BreedIdSimilarity[breed1.Id][breed2.Id] = value;
             }
-            similarity.SizeSimilarity[breed1][breed2] = value;
+            else
+            {
+                curRes.SimilarityValues[breed2] = 0;
+            }
         }
-    }
-    private void UpdateValue(Breed breed1, Breed breed2, double value)
-    {
-        if (value >= 0 && value <= 1)
-        {
-            similarity.SizeSimilarity[breed1][breed2] = value;
-        }
+        
+        //if (value >= 0 && value <= 1)
+        //{
+        //    await Task.Delay(1); // Заглушка для асинхронности
+        //    similarity.BreedSimilarity[breed1][breed2] = value;
+        //    similarity.BreedIdSimilarity[breed1.Id][breed2.Id] = value;
         //}
         //else
         //{
-        //    similarity.SizeSimilarity[outerKey][innerKey] = 0; // Можно задать другое значение по умолчанию
+        //    similarity.BreedSimilarity[breed1][breed2] = 0.0;
         //}
     }
 }
@@ -69,20 +108,22 @@
     <table class="table table-bordered">
         <tr>
             <th></th>
-            @foreach (var h in similarity.SizeSimilarity)
+            @foreach (var b in breedsSimilarity)
             {
-                <th style="text-align:center; font-weight: 400;">@h.Key.Name</th>
+                <th style="text-align:center; font-weight: 400;">@b.AnimalBreed.Name</th>
+                
             }
         </tr>
-        @foreach (var kvp in similarity.SizeSimilarity)
+        @foreach (var kvp in breedsSimilarity)
         {
             <tr>
-                <td>@kvp.Key</td>
-                @foreach (var innerKvp in kvp.Value)
+                <td>@kvp.AnimalBreed.Name</td>
+                @foreach (var innerKvp in kvp.SimilarityValues)
                 {
+                    // 
                     <td class="border">
-                        <input type="number" @oninput="@((e)=>UpdateValue(kvp.Key, innerKvp.Key , innerKvp.Value))" value="@innerKvp.Value" 
-                        step="0.1" min="0" max="1" class="form-control" />
+                        <input type="number" @onchange="@((e)=>UpdateValue(kvp.AnimalBreed, innerKvp.Key, e))"
+                       step="0.1" min="0" max="1" class="form-control"/>
                     </td>
                 }
             </tr>

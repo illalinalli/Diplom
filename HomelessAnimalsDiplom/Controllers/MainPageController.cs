@@ -12,7 +12,7 @@ namespace HomelessAnimalsDiplom.Controllers
            }*/
 
         [HttpPost]
-        public async Task<IActionResult> AdvertisementView(string curTitle)
+        public IActionResult AdvertisementView(string curTitle)
         {
             return RedirectToAction("MainPage", "Home");
         }

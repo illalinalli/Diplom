@@ -17,7 +17,7 @@ namespace HomelessAnimalsDiplom.Models
         public static IMongoCollection<AnimalType>? AnimalTypeCollection;
         public static IMongoCollection<PropertyType> PropertyTypeCollection;
         public static IMongoCollection<PropertyValue>? PropertyValueCollection;
-        public static IMongoCollection<Similarity>? SimilarityCollection;
+        public static IMongoCollection<BreedSimilarity>? BreedSimilarityCollection;
 
         //public static List<Item>? PublicationLeafCollection;
         public static string GetHash(string password)
@@ -78,7 +78,7 @@ namespace HomelessAnimalsDiplom.Models
             AnimalTypeCollection = DB.GetCollection<AnimalType>("AnimalType");
             PropertyTypeCollection = DB.GetCollection<PropertyType>("PropertyType");
             PropertyValueCollection = DB.GetCollection<PropertyValue>("PropertyValue");
-            SimilarityCollection = DB.GetCollection<Similarity>("Similarity");
+            BreedSimilarityCollection = DB.GetCollection<BreedSimilarity>("BreedSimilarity");
             SetBreedsNum();
             SetColorsNum();
 

@@ -7,15 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Accord.MachineLearning" Version="3.8.0" />
-    <PackageReference Include="Accord.Math" Version="3.8.0" />
-    <PackageReference Include="BaseLibS" Version="1.6.4.382" />
-    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.26" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.26" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.29" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.29" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
-    <PackageReference Include="MongoDB.Driver" Version="2.23.1" />
-    <PackageReference Include="NumSharp.Lite" Version="0.1.12" />
+    <PackageReference Include="MongoDB.Driver" Version="2.25.0" />
     <PackageReference Include="Radzen.Blazor" Version="4.20.1" />
   </ItemGroup>
 
