@@ -69,5 +69,39 @@ namespace HomelessAnimalsDiplom.Models
         {
             Id = ObjectId.GenerateNewId();
         }
+
+        public static double[,] ConvertToDoubleMatrix(List<BreedSimilarity> breedSimilarities, List<Breed> allBreeds)
+        {
+            var doubleMatrix = new double[allBreeds.Count, allBreeds.Count];
+
+            // Initialize the matrix with default values
+            for (int i = 0; i < allBreeds.Count; i++)
+            {
+                for (int j = 0; j < allBreeds.Count; j++)
+                {
+                    doubleMatrix[i, j] = 0.0;
+                }
+            }
+
+            // Fill the matrix with similarity values
+            foreach (var breedSimilarity in breedSimilarities)
+            {
+                int row = allBreeds.IndexOf(breedSimilarity.AnimalBreed);
+
+                if (row != -1)
+                {
+                    foreach (var similarityEntry in breedSimilarity.SimilarityValues)
+                    {
+                        int column = allBreeds.IndexOf(similarityEntry.Key);
+                        if (column != -1)
+                        {
+                            doubleMatrix[row, column] = similarityEntry.Value;
+                        }
+                    }
+                }
+            }
+
+            return doubleMatrix;
+        }
     }
 }

@@ -65,5 +65,39 @@ namespace HomelessAnimalsDiplom.Models
 
             return res;
         }
+
+        public static double[,] ConvertToDoubleMatrix(List<SizeSimilarity> sizesSimilarities, List<PropertyValue> allSizes)
+        {
+            var doubleMatrix = new double[allSizes.Count, allSizes.Count];
+
+            // Initialize the matrix with default values
+            for (int i = 0; i < allSizes.Count; i++)
+            {
+                for (int j = 0; j < allSizes.Count; j++)
+                {
+                    doubleMatrix[i, j] = 0.0;
+                }
+            }
+
+            // Fill the matrix with similarity values
+            foreach (var sizeSimilarity in sizesSimilarities)
+            {
+                int row = allSizes.IndexOf(sizeSimilarity.Size);
+
+                if (row != -1)
+                {
+                    foreach (var similarityEntry in sizeSimilarity.SimilarityValues)
+                    {
+                        int column = allSizes.IndexOf(similarityEntry.Key);
+                        if (column != -1)
+                        {
+                            doubleMatrix[row, column] = similarityEntry.Value;
+                        }
+                    }
+                }
+            }
+
+            return doubleMatrix;
+        }
     }
 }

@@ -5,32 +5,36 @@
         //public static readonly Period[] Periods;
         public static double[,] BreedsSimilarity;
         public static double[,] ColorsSimilarity;
+        public static double[,] SizesSimilarity;
         public const int MAX_BREED_DIFFERENCE = 4;
         public const int MAX_TREE_PROXIMITY = 5; // уровни
         public static double MAX_COLOR_DIFFERENCE { get; } = 2;
         public static double MAX_SIZE_DIFFERENCE { get; } = 2;
         static ItemHelper()
         {
-            BreedsSimilarity = new[,]
-            {
-                { 1, 0.2, 0.1, 0, 0, 0 }, // Мейн-Кун
-                { 0.2, 1, 0.3, 0, 0, 0 }, // Британская
-                { 0.1, 0.3, 1, 0, 0, 0 }, // Другая (кот)
-                { 0, 0, 0, 1, 0.1, 0.2 }, // Мопс
-                { 0, 0, 0, 0.1, 1, 0.6 }, // Нем овчарка
-                { 0, 0, 0, 0.2, 0.6, 1 }, // Другая (собака)
-            };
+            //BreedsSimilarity = new[,]
+            //{
+            //    { 1, 0.2, 0.1, 0, 0, 0 }, // Мейн-Кун
+            //    { 0.2, 1, 0.3, 0, 0, 0 }, // Британская
+            //    { 0.1, 0.3, 1, 0, 0, 0 }, // Другая (кот)
+            //    { 0, 0, 0, 1, 0.1, 0.2 }, // Мопс
+            //    { 0, 0, 0, 0.1, 1, 0.6 }, // Нем овчарка
+            //    { 0, 0, 0, 0.2, 0.6, 1 }, // Другая (собака)
+            //};
 
-            ColorsSimilarity = new[,]
-            {
-                { 1, 0, 0.1, 0, 0, 0, 0 }, // white
-                { 0, 1, 0.3, 0, 0, 0, 0 }, // black
-                { 0.1, 0.3, 1, 0, 0, 0, 0.6 }, // gray
-                { 0, 0, 0, 1, 0.6, 0.5, 0 }, // рыжий
-                { 0, 0, 0, 0.6, 1, 0.3, 0 }, // brown
-                { 0, 0, 0, 0.5, 0.3, 1, 0 }, // бежевый
-                { 0, 0, 0.6, 0, 0, 0, 1 }, // blue
-            };
+            //ColorsSimilarity = new[,]
+            //{
+            //    { 1, 0, 0.1, 0, 0, 0, 0 }, // white
+            //    { 0, 1, 0.3, 0, 0, 0, 0 }, // black
+            //    { 0.1, 0.3, 1, 0, 0, 0, 0.6 }, // gray
+            //    { 0, 0, 0, 1, 0.6, 0.5, 0 }, // рыжий
+            //    { 0, 0, 0, 0.6, 1, 0.3, 0 }, // brown
+            //    { 0, 0, 0, 0.5, 0.3, 1, 0 }, // бежевый
+            //    { 0, 0, 0.6, 0, 0, 0, 1 }, // blue
+            //};
+            BreedsSimilarity = BreedSimilarity.ConvertToDoubleMatrix(BreedSimilarity.GetAllBreedsSimilarity(), Breed.GetAllBreeds());
+            ColorsSimilarity = ColorSimilarity.ConvertToDoubleMatrix(ColorSimilarity.GetAllColorsSimilarity(), Item.GetAllColors());
+            SizesSimilarity = SizeSimilarity.ConvertToDoubleMatrix(SizeSimilarity.GetAllSizesSimilarity(), PropertyValue.GetAllSizes());
         }
         public static double GetSizesSimilarity(string size1, string size2)
         {

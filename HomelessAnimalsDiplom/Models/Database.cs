@@ -85,6 +85,7 @@ namespace HomelessAnimalsDiplom.Models
             SizeSimilarityCollection = DB.GetCollection<SizeSimilarity>("SizeSimilarity");
             SetBreedsNum();
             SetColorsNum();
+            SetSizesNum();
 
             //AddProps();
             //HashPassword();

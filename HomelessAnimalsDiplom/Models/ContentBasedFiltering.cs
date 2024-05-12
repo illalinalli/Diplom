@@ -300,8 +300,11 @@ namespace HomelessAnimalsDiplom.Models
             {
                 colorsNum2.Add(c2.GetColorNumber());
             }
-            var allPropTypes = GetAllProperties();
-            var size1 = item1.GetBreedSize();
+            List<int> sizesNum1 = new();
+            List<int> sizesNum2 = new();
+           
+           
+            var size1 = item1.GetBreedSizeNum();
             var size2 = item2.GetBreedSize();
             return new[]
             {
