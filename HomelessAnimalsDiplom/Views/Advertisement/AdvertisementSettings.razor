@@ -6,7 +6,6 @@
 @using System.IO;
 @code {
     private ObjectId selectedAnimalType;
-    //private ObjectId selectedBreed;
     Item item = new();
     AnimalType animalType = new();
     Breed breed = new();    
@@ -55,31 +54,6 @@
         breed.Id = ObjectId.Parse(args.Value.ToString());
 
     }
-
-    //private ObjectId selectedBreedId;
-
-    //private void HandleAnimalTypeChange(ChangeEventArgs args)
-    //{
-    //    if (args.Value == null) return;
-
-    //    var typeId = ObjectId.Parse(args.Value.ToString());
-
-    //    if (typeId != ObjectId.Empty)
-    //    {
-    //        breeds = BreedCollection
-    //            .Find(x => x.AnimalTypeRef == typeId)
-    //            .ToList();
-    //    }
-    //    selectedBreedId = ObjectId.Empty; // Сбрасываем выбранную породу при изменении типа животного
-    //}
-
-    //private void HandleAnimalBreedChange(ChangeEventArgs args)
-    //{
-    //    if (args.Value == null) return;
-
-    //    selectedBreedId = ObjectId.Parse(args.Value.ToString());
-    //    // Здесь вы можете выполнить нужные действия с выбранной породой
-    //}
 
     bool IsChecked(ObjectId id)
     {

@@ -1,7 +1,9 @@
-﻿using MongoDB.Bson;
+﻿using Amazon.Runtime.Internal.Transform;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Options;
 using MongoDB.Driver;
+using NuGet.Packaging;
 using static HomelessAnimalsDiplom.Models.Database;
 
 namespace HomelessAnimalsDiplom.Models
@@ -18,52 +20,49 @@ namespace HomelessAnimalsDiplom.Models
         {
             return BreedSimilarityCollection.Find(new BsonDocument()).ToList();
         }
-        //public void Fill()
-        //{
-        //    var allBreedsSimilarity = GetAllBreedsSimilarity();
-        //    List<Breed> breeds = Item.GetAllBreeds();
 
-        //    foreach (var breed in breeds)
-        //    {
-        //        var existingSimilarity = allBreedsSimilarity.FirstOrDefault(bs => bs.AnimalBreed.Id == breed.Id);
-        //        var res = existingSimilarity.SimilarityValues[breed];
-        //        SimilarityValues[breed] = existingSimilarity != null ? existingSimilarity.SimilarityValues[breed] : 0;
-        //    }
-        //}
         public static List<BreedSimilarity> Fill()
         {
             var allBreedsSimilarity = GetAllBreedsSimilarity();
             List<Breed> breeds = Item.GetAllBreeds();
             List<BreedSimilarity> res = new();
-            foreach (var breed in breeds)
-            {
-                var existingSimilarity = allBreedsSimilarity.FirstOrDefault(bs => bs.AnimalBreed.Id == breed.Id);
-                if (existingSimilarity != null)
-                {
-                    res.Add(existingSimilarity); 
-                    //if (existingSimilarity.SimilarityValues.TryGetValue(breed, out double similarity))
-                    //{
-                    //    // Значение similarity теперь доступно, если ключ существует
-                    //    SimilarityValues[breed] = similarity;
-                    //}
-                    //else
-                    //{
-                    //    // Ключ не найден в словаре, установите значение по умолчанию или обработайте этот случай
-                    //    existingSimilarity.SimilarityValues[breed] = 0;
-                    //}
-                }
-                else
-                {
-                    BreedSimilarity bs = new()
-                    {
-                        AnimalBreed = breed,
-                        SimilarityValues = new()
-                    };
 
-                    // Обработка случая, когда нет соответствующего элемента BreedSimilarity для данного breed
-                    // Например, можно создать новый экземпляр BreedSimilarity и добавить его в список
+            if (breeds.Count != allBreedsSimilarity.Count)
+            {
+                // Находим новые породы, для которых не существует записей схожести
+                var newBreeds = breeds.Where(b => allBreedsSimilarity.All(bs => bs.AnimalBreed.Id != b.Id)).ToList();
+
+                // Добавляем новые породы в матрицу
+                foreach (var newBreed in newBreeds)
+                {
+                    BreedSimilarity newBreedSimilarity = new BreedSimilarity
+                    {
+                        AnimalBreed = newBreed
+                    };
+                    allBreedsSimilarity.Add(newBreedSimilarity);
+
+                    // Добавляем значения 0 для всех имеющихся пород в SimilarityValues
+                    foreach (var bs in allBreedsSimilarity)
+                    {
+                        if (bs.AnimalBreed != newBreed)
+                        {
+                            bs.SimilarityValues.Add(newBreed, 0);
+
+                        }
+                        else
+                        {
+                            if (bs.SimilarityValues.Count() == 0)
+                            {
+                                breeds.ForEach(b => bs.SimilarityValues.Add(b, 0));
+                            }
+                        }
+                    }
                 }
             }
+
+            // Добавляем все записи схожести в результат
+            res.AddRange(allBreedsSimilarity);
+
             return res;
         }
         public BreedSimilarity()

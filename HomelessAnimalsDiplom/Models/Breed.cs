@@ -13,9 +13,43 @@ namespace HomelessAnimalsDiplom.Models
         //public List<Breed> SubBreeds { get; set; } = new();
         public ObjectId AnimalTypeRef { get; set; }
 
+        public Breed()
+        {
+            Id = ObjectId.GenerateNewId();
+        }
+
         [BsonIgnore]
         public static Dictionary<ObjectId, int> BreedsNums { get; set; } = new();
 
+        // Переопределяем метод Equals
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Breed other = (Breed)obj;
+            return Id.Equals(other.Id);
+        }
+
+        // Переопределяем метод GetHashCode
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
+    
+        public static void SaveNewBreed(Breed newBreed)
+        {
+            if (newBreed.Name == null && newBreed.AnimalTypeRef == ObjectId.Empty
+                && newBreed.SizeRef == ObjectId.Empty && newBreed.Id == ObjectId.Empty) return;
+            // создание фильтра для поиска существующей записи
+            var filter = Builders<Breed>.Filter.Eq("_id", newBreed.Id);
+
+            // выполнение операции upsert
+            BreedCollection?.ReplaceOneAsync(filter, newBreed, ReplaceOptionsUpsert);
+            //return newBreed;
+        }
         public static List<Breed> GetAllBreeds()
         {
             return BreedCollection.Find(new BsonDocument()).ToList();

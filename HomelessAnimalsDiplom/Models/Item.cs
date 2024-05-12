@@ -14,7 +14,6 @@ namespace HomelessAnimalsDiplom.Models
         public bool IsPublished { get; set; }
         public List<byte[]>? Images { get; set; }
         public ObjectId BreedRef { get; set; }
-
         public List<ObjectId>? Properties { get; set; } = new();
         public List<PropertyValue> Colors { get; set; } = new();
         public PropertyValue Sex { get; set; }
@@ -30,15 +29,11 @@ namespace HomelessAnimalsDiplom.Models
         public AnimalType GetAnimalType()
         {
             var curBreed = GetBreed();
-            var allTypes = GetAnimalTypes();
+            var allTypes = AnimalType.GetAnimalTypes();
             var res = allTypes.FirstOrDefault(x => x.Id == curBreed.AnimalTypeRef);
             return res;
         }
-
-        public List<AnimalType> GetAnimalTypes()
-        {
-            return AnimalTypeCollection.Find(new BsonDocument()).ToList();
-        }
+        
         public List<Item> GetAllCats()
         {
             var allItems = ItemCollection.Find(new BsonDocument()).ToList();
