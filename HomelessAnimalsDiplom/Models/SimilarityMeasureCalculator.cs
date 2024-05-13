@@ -35,7 +35,7 @@ namespace HomelessAnimalsDiplom.Models
 
         static double GetSizesSimilarity(Item item1, Item item2)
         {
-            var simSize = ItemHelper.GetSizesSimilarity(item1.GetBreedSize().Name, item2.GetBreedSize().Name);
+            var simSize = ItemHelper.GetSizesSimilarity(item1.GetSizeNum(item1.GetBreed()), item2.GetSizeNum(item2.GetBreed()));
             var size1 = item1.GetBreedSize();
             var size2 = item2.GetBreedSize();
 

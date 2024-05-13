@@ -19,6 +19,9 @@ namespace HomelessAnimalsDiplom.Models
         }
 
         [BsonIgnore]
+        public static Dictionary<ObjectId, int> SizesNums { get; set; } = new();
+
+        [BsonIgnore]
         public static Dictionary<ObjectId, int> BreedsNums { get; set; } = new();
 
         // Переопределяем метод Equals
@@ -50,6 +53,7 @@ namespace HomelessAnimalsDiplom.Models
             BreedCollection?.ReplaceOneAsync(filter, newBreed, ReplaceOptionsUpsert);
             //return newBreed;
         }
+
         public static List<Breed> GetAllBreeds()
         {
             return BreedCollection.Find(new BsonDocument()).ToList();

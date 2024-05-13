@@ -33,41 +33,43 @@
             //    { 0, 0, 0.6, 0, 0, 0, 1 }, // blue
             //};
             BreedsSimilarity = BreedSimilarity.ConvertToDoubleMatrix(BreedSimilarity.GetAllBreedsSimilarity(), Breed.GetAllBreeds());
-            ColorsSimilarity = ColorSimilarity.ConvertToDoubleMatrix(ColorSimilarity.GetAllColorsSimilarity(), Item.GetAllColors());
-            SizesSimilarity = SizeSimilarity.ConvertToDoubleMatrix(SizeSimilarity.GetAllSizesSimilarity(), PropertyValue.GetAllSizes());
+            ColorsSimilarity = ColorSimilarity.ConvertToDoubleMatrix(ColorSimilarity.GetAllColorsSimilarity()); // Item.GetAllColors()
+            SizesSimilarity = SizeSimilarity.ConvertToDoubleMatrix(SizeSimilarity.GetAllSizesSimilarity());
         }
-        public static double GetSizesSimilarity(string size1, string size2)
+        public static double GetSizesSimilarity(int size1, int size2)
         {
-            // Приведем размеры к нижнему регистру для удобства сравнения
-            size1 = size1.ToLower();
-            size2 = size2.ToLower();
+            //// Приведем размеры к нижнему регистру для удобства сравнения
+            //size1 = size1.ToLower();
+            //size2 = size2.ToLower();
 
-            // Проверяем сходство размеров
-            if (size1 == size2)
-            {
-                // Если размеры полностью совпадают
-                return 1.0;
-            }
-            else if ((size1 == "мелкий" && size2 == "средний") || (size1 == "средний" && size2 == "мелкий"))
-            {
-                // Если размеры отличаются на один уровень (мелкий и средний)
-                return 0.5;
-            }
-            else if ((size1 == "мелкий" && size2 == "крупный") || (size1 == "крупный" && size2 == "мелкий"))
-            {
-                // Если размеры отличаются на два уровня (мелкий и крупный)
-                return 0.2;
-            }
-            else if ((size1 == "средний" && size2 == "крупный") || (size1 == "крупный" && size2 == "средний"))
-            {
-                // Если размеры отличаются на один уровень (средний и крупный)
-                return 0.7;
-            }
-            else
-            {
-                // Если размеры полностью различны
-                return 0.0;
-            }
+            //// Проверяем сходство размеров
+            //if (size1 == size2)
+            //{
+            //    // Если размеры полностью совпадают
+            //    return 1.0;
+            //}
+            //else if ((size1 == "мелкий" && size2 == "средний") || (size1 == "средний" && size2 == "мелкий"))
+            //{
+            //    // Если размеры отличаются на один уровень (мелкий и средний)
+            //    return 0.5;
+            //}
+            //else if ((size1 == "мелкий" && size2 == "крупный") || (size1 == "крупный" && size2 == "мелкий"))
+            //{
+            //    // Если размеры отличаются на два уровня (мелкий и крупный)
+            //    return 0.2;
+            //}
+            //else if ((size1 == "средний" && size2 == "крупный") || (size1 == "крупный" && size2 == "средний"))
+            //{
+            //    // Если размеры отличаются на один уровень (средний и крупный)
+            //    return 0.7;
+            //}
+            //else
+            //{
+            //    // Если размеры полностью различны
+            //    return 0.0;
+            //}
+
+            return SizesSimilarity[size1, size2];
         }
         public static double GetColorsSimilarity(int[] colors1, int[] colors2)
         {

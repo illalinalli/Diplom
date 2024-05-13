@@ -68,38 +68,33 @@ namespace HomelessAnimalsDiplom.Models
             return res;
         }
 
-        public static double[,] ConvertToDoubleMatrix(List<ColorSimilarity> colorSimilarities, List<PropertyValue> allColors)
+        public static double[,] ConvertToDoubleMatrix(List<ColorSimilarity> colorSimilarities)
         {
-            var doubleMatrix = new double[allColors.Count, allColors.Count];
+            List<PropertyValue> colors = Item.GetAllColors();
+            double[,] result = new double[colors.Count, colors.Count];
 
-            // Initialize the matrix with default values
-            for (int i = 0; i < allColors.Count; i++)
+            // Заполняем массив нулями
+            for (int i = 0; i < colors.Count; i++)
             {
-                for (int j = 0; j < allColors.Count; j++)
+                for (int j = 0; j < colors.Count; j++)
                 {
-                    doubleMatrix[i, j] = 0.0;
+                    result[i, j] = 0.0;
                 }
             }
 
-            // Fill the matrix with similarity values
+            // Заполняем массив значениями из SimilarityValues
             foreach (var colorSimilarity in colorSimilarities)
             {
-                int row = allColors.IndexOf(colorSimilarity.Color);
+                int row = colors.FindIndex(c => c.Id == colorSimilarity.Color.Id);
 
-                if (row != -1)
+                foreach (var similarityValue in colorSimilarity.SimilarityValues)
                 {
-                    foreach (var similarityEntry in colorSimilarity.SimilarityValues)
-                    {
-                        int column = allColors.IndexOf(similarityEntry.Key);
-                        if (column != -1)
-                        {
-                            doubleMatrix[row, column] = similarityEntry.Value;
-                        }
-                    }
+                    int col = colors.FindIndex(c => c.Id == similarityValue.Key.Id);
+                    result[row, col] = similarityValue.Value;
                 }
             }
 
-            return doubleMatrix;
+            return result;
         }
     }
 }

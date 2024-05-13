@@ -25,9 +25,7 @@ namespace HomelessAnimalsDiplom.Models
 
         [BsonIgnore]
         public static Dictionary<ObjectId, int> ColorsNums { get; set; } = new();
-        [BsonIgnore]
-        public static Dictionary<ObjectId, int> SizesNums { get; set; } = new();
-
+        
         public AnimalType GetAnimalType()
         {
             var curBreed = GetBreed();
@@ -61,6 +59,10 @@ namespace HomelessAnimalsDiplom.Models
         {
             return BreedsNums[BreedRef];
         }
+        public int GetSizeNum(Breed breed)
+        {
+            return SizesNums[breed.SizeRef];
+        }
         public Breed GetBreed()
         {
             var a = GetAllBreeds();
@@ -77,11 +79,7 @@ namespace HomelessAnimalsDiplom.Models
             return size;
         }
 
-        public int GetBreedSizeNum()
-        {
-           // ItemHelper.SizesSimilarity
-            return -1;
-        }
+        
         public static List<Breed> GetAllBreeds()
         {
             return BreedCollection.Find(new BsonDocument()).ToList();

@@ -300,12 +300,14 @@ namespace HomelessAnimalsDiplom.Models
             {
                 colorsNum2.Add(c2.GetColorNumber());
             }
-            List<int> sizesNum1 = new();
-            List<int> sizesNum2 = new();
-           
-           
-            var size1 = item1.GetBreedSizeNum();
-            var size2 = item2.GetBreedSize();
+            //List<int> sizesNum1 = new();
+            //List<int> sizesNum2 = new();
+
+            //sizesNum1.Add(item1.GetSizeNum(item1.GetBreed()));
+            //sizesNum2.Add(item2.GetSizeNum(item2.GetBreed()));
+            var a = item1.GetSizeNum(item1.GetBreed());
+            var b = item2.GetSizeNum(item2.GetBreed());
+
             return new[]
             {
                 new ValuePair(1,
@@ -315,13 +317,10 @@ namespace HomelessAnimalsDiplom.Models
                         ItemHelper.GetColorsSimilarity(colorsNum1.ToArray(), colorsNum2.ToArray()),
                         ItemHelper.MAX_COLOR_DIFFERENCE),
                 new ValuePair(1,
-                        ItemHelper.GetSizesSimilarity(size1.Name, size2.Name),
+                        ItemHelper.GetSizesSimilarity(item1.GetSizeNum(item1.GetBreed()), item2.GetSizeNum(item2.GetBreed())),
                         ItemHelper.MAX_SIZE_DIFFERENCE)
-            //new ValuePair()
-            //{
-
-            //}
-        };
+         
+            };
         }
     }
 }
