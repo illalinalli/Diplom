@@ -18,6 +18,7 @@
     PropertyValue newColor = new();
     List<ColorSimilarity> colorsSimilarity = new();
     List<SizeSimilarity> sizesSimilarity = new();
+    List<CoefficientAdjuster> Coefficients = new();
     protected override void OnInitialized()
     {
         var allBreeds = Item.GetAllBreeds();
@@ -27,7 +28,7 @@
         selectedAnimalType = new();
         selectedSize = new();
         AnimalTypes = AnimalType.GetAnimalTypes();
-
+        Coefficients = CoefficientAdjuster.GetAllCoefficients();
     }
 
     public void Save()
@@ -104,7 +105,7 @@
                 else
                 {
                     curRes.SimilarityValues[val2] = value;
-                    
+
                 }
             }
             else
@@ -159,7 +160,7 @@
         }
         StateHasChanged();
     }
-   
+
     void SizeClicked(ChangeEventArgs args)
     {
         if (args.Value == null) return;
@@ -169,132 +170,164 @@
 
         StateHasChanged();
     }
+
+    void SaveCoefficients()
+    {
+        foreach (var coefficient in Coefficients)
+        {
+            coefficient.Save();
+        }
+        StateHasChanged();
+    }
 }
 <div class="container-fluid">
-   <h4>Добавление новой породы животного</h4>
+    <div class="bordered">
+       <h4>Добавление новой породы животного</h4>
 
-    <div>
-        <label>Название породы:</label>
-        <input class="form-control mb-2" @bind="newBreed.Name" />
-    </div>
-
-    <div>
-        <label>Выберите тип животного:</label>
-        <select class="form-control mb-2" value="@selectedAnimalType.IdAsString" @onchange="TypeClicked">
-            @foreach (var at in AnimalType.GetAnimalTypes())
-            {
-                <option value="@at.IdAsString">@at.Name</option>
-            }
-        </select>
-    </div>
-    <div>
-        <label>Выберите размер животного:</label>
-        <select class="form-control mb-3" value="@selectedSize.Id" @onchange="SizeClicked">
-            @foreach (var size in PropertyValue.GetAllSizes())
-            {
-                <option value="@size.IdAsString">@size.Name</option>
-            }
-        </select>
-    </div>
-    <button class="btn btn-primary mb-3 me-3" @onclick="AddBreed">Сохранить породу</button>
-
-    @if (breeds.Count() > 0)
-    {
-        <div class="btn-group dropend mb-3 me-3">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" style="color: #fff; font-size: 14px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Существующие породы животных
-            </button>
-            <ul class="dropdown-menu">
-                @foreach (var breed in breeds)
-                {
-                    <li style="text-align: center;">@breed.Name</li>
-                }
-            </ul>   
+        <div>
+            <label>Название породы:</label>
+            <input class="form-control mb-2" @bind="newBreed.Name" />
         </div>
-    }
 
-    <h4>Добавление нового окраса животного</h4>
-    <div>
-        <label>Название окраса:</label>
-        <input class="form-control mb-3" @bind="newColor.Name" />
+        <div>
+            <label>Выберите тип животного:</label>
+            <select class="form-control mb-2" value="@selectedAnimalType.IdAsString" @onchange="TypeClicked">
+                @foreach (var at in AnimalType.GetAnimalTypes())
+                {
+                    <option value="@at.IdAsString">@at.Name</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label>Выберите размер животного:</label>
+            <select class="form-control mb-3" value="@selectedSize.Id" @onchange="SizeClicked">
+                @foreach (var size in PropertyValue.GetAllSizes())
+                {
+                    <option value="@size.IdAsString">@size.Name</option>
+                }
+            </select>
+        </div>
+        <button class="btn btn-primary save-button mb-3 me-3" @onclick="AddBreed">Сохранить породу</button>
+
+        @if (breeds.Count() > 0)
+        {
+            <div class="btn-group dropend mb-3 me-3">
+                <button class="btn btn-secondary btn-sm dropdown-toggle" style="color: #fff; font-size: 14px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Существующие породы животных
+                </button>
+                <ul class="dropdown-menu">
+                    @foreach (var breed in breeds)
+                    {
+                        <li style="text-align: center;">@breed.Name</li>
+                    }
+                </ul>   
+            </div>
+        }
+
     </div>
-    <button class="btn btn-primary mb-3" @onclick="AddColor">Сохранить окрас</button>
 
-    <h4 class="pt-3">Матрица схожести окрасов</h4>
-    <table class="table table-bordered mb-3">
-        <tr>
-            <th></th>
-            @foreach (var c in colorsSimilarity)
-            {
-                <th style="text-align:center; font-weight: 400;">@c.Color.Name</th>
+    <div class="bordered">
+        <h4>Добавление нового окраса животного</h4>
+        <div>
+            <label>Название окраса:</label>
+            <input class="form-control mb-3" @bind="newColor.Name" />
+        </div>
+        <button class="btn btn-primary save-button mb-3" @onclick="AddColor">Сохранить окрас</button>
 
-            }
-        </tr>
-        @foreach (var kvp in colorsSimilarity)
-        {
+    </div>
+    <div class="bordered">
+
+        <h4 class="pt-3">Матрица схожести окрасов</h4>
+        <table class="table table-bordered mb-3">
             <tr>
-                <td>@kvp.Color.Name</td>
-                @foreach (var innerKvp in kvp.SimilarityValues)
+                <th></th>
+                @foreach (var c in colorsSimilarity)
                 {
-                    //
-                    <td class="border">
-                        <input type="text" value="@innerKvp.Value.ToString()" @onchange="@((e)=>UpdateColorMatrixValue(kvp.Color, innerKvp.Key, e))"
-                       step="0.1" min="0" max="1" class="form-control" />
-                    </td>
+                    <th style="text-align:center; font-weight: 400;">@c.Color.Name</th>
+
                 }
             </tr>
-        }
-    </table>
-
-    <h4 class="pt-3">Матрица схожести пород</h4>
-    <table class="table table-bordered mb-2">
-        <tr>
-            <th></th>
-            @foreach (var b in breedsSimilarity)
+            @foreach (var kvp in colorsSimilarity)
             {
-                <th style="text-align:center; font-weight: 400;">@b.AnimalBreed.Name</th>
+                <tr>
+                    <td>@kvp.Color.Name</td>
+                    @foreach (var innerKvp in kvp.SimilarityValues)
+                    {
+                        //
+                        <td class="border">
+                            <input type="text" value="@innerKvp.Value.ToString()" @onchange="@((e)=>UpdateColorMatrixValue(kvp.Color, innerKvp.Key, e))"
+                           step="0.1" min="0" max="1" class="form-control" />
+                        </td>
+                    }
+                </tr>
             }
-        </tr>
-        @foreach (var kvp in breedsSimilarity)
-        {
-            <tr>
-                <td>@kvp.AnimalBreed.Name</td>
-                @foreach (var innerKvp in kvp.SimilarityValues)
+        </table>
+
+        <h4 class="pt-3">Матрица схожести пород</h4>
+        <div style="overflow-x: auto; overflow-y: auto; max-height: 300px;">
+            <table class="table table-bordered mb-2">
+                <tr>
+                    <th></th>
+                    @foreach (var b in breedsSimilarity)
+                    {
+                        <th style="text-align:center; font-weight: 400; position: sticky; top: 0; background-color: white;">@b.AnimalBreed.Name</th>
+                    }
+                </tr>
+                @foreach (var kvp in breedsSimilarity)
                 {
-                   <td class="border">
-                        <input type="text" value="@innerKvp.Value.ToString()" @onchange="@((e)=>UpdateBreedMatrixValue(kvp.AnimalBreed, innerKvp.Key, e))"
-                       step="0.1" min="0" max="1" class="form-control"/>
-                   </td>
+                    <tr>
+                        <td style="position: sticky; left: 0; background-color: white;">@kvp.AnimalBreed.Name</td>
+                        @foreach (var innerKvp in kvp.SimilarityValues)
+                        {
+                           <td class="border">
+                                <input type="text" value="@innerKvp.Value.ToString()" @onchange="@((e)=>UpdateBreedMatrixValue(kvp.AnimalBreed, innerKvp.Key, e))"
+                               step="0.1" min="0" max="1" class="form-control"/>
+                           </td>
+                        }
+                    </tr>
+                }
+            </table>
+        </div>
+
+        <h4 class="pt-3">Матрица схожести размеров</h4>
+        <table class="table table-bordered mb-3">
+            <tr>
+                <th></th>
+                @foreach (var c in sizesSimilarity)
+                {
+                    <th style="text-align:center; font-weight: 400;">@c.Size.Name</th>
+
                 }
             </tr>
-        }
-    </table>
-
-    <h4 class="pt-3">Матрица схожести размеров</h4>
-    <table class="table table-bordered mb-3">
-        <tr>
-            <th></th>
-            @foreach (var c in sizesSimilarity)
+            @foreach (var kvp in sizesSimilarity)
             {
-                <th style="text-align:center; font-weight: 400;">@c.Size.Name</th>
-
+                <tr>
+                    <td>@kvp.Size.Name</td>
+                    @foreach (var innerKvp in kvp.SimilarityValues)
+                    {
+                        //
+                        <td class="border">
+                            <input type="text" value="@innerKvp.Value.ToString()" @onchange="@((e)=>UpdateColorMatrixValue(kvp.Size, innerKvp.Key, e))"
+                           step="0.1" min="0" max="1" class="form-control" />
+                        </td>
+                    }
+                </tr>
             }
-        </tr>
-        @foreach (var kvp in sizesSimilarity)
+        </table>
+        <button class="btn btn-primary save-button mb-3 pt-3" @onclick="Save">Сохранить изменения матриц</button>
+    </div>
+    <div class="bordered">
+        <h4 class="pt-3">Настройка коэффициентов рекомендательной системы</h4>
+        @foreach (var coefficient in Coefficients)
         {
-            <tr>
-                <td>@kvp.Size.Name</td>
-                @foreach (var innerKvp in kvp.SimilarityValues)
-                {
-                    //
-                    <td class="border">
-                        <input type="text" value="@innerKvp.Value.ToString()" @onchange="@((e)=>UpdateColorMatrixValue(kvp.Size, innerKvp.Key, e))"
-                       step="0.1" min="0" max="1" class="form-control" />
-                    </td>
-                }
-            </tr>
+            @*<div class="mb-2 pt-2">@coefficient.Name</div>*@
+            <div>
+                <label>@coefficient.Name:</label>
+                <input class="form-control mb-3" @bind="coefficient.CoefficientValue" />
+            </div>
+            
         }
-    </table>
-
-    <button class="btn btn-primary mb-3 pt-3" @onclick="Save">Сохранить изменения</button>
+        <button class="btn btn-primary save-button mb-3" @onclick="SaveCoefficients">Сохранить коэффициенты</button>
+    </div>
+    
 </div>

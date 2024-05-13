@@ -80,3 +80,43 @@
     font-weight: 400 !important;
     text-align: center !important;
 }
+
+.bordered {
+    border: 1px solid #ccc !important;
+    border-radius: 5px !important;
+    padding: 10px !important;
+    margin-bottom: 10px !important;
+    background-color: #f9f9f9 !important;
+    padding: 10px 10px 10px 10px !important;
+}
+
+.save-button {
+    border: 1px solid #ccc !important;
+    border-radius: 5px !important;
+    padding: 10px !important;
+    background-color: #4169E1 !important;
+    color: white !important;
+    text-align: center !important;
+    display: inline-block !important;
+    cursor: pointer !important;
+}
+
+.table-responsive {
+    overflow-x: auto !important;
+}
+
+table {
+    width: 100% !important;
+}
+
+.thead th {
+    position: sticky !important;
+    top: 0 !important;
+    background-color: #f3f3f3 !important;
+}
+
+td:first-child, th:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    background-color: #f3f3f3 !important;
+}

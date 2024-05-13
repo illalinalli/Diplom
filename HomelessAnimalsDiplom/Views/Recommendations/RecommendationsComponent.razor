@@ -7,7 +7,7 @@
 @using static Controllers.HomeController;
 @using static Models.ContentBasedFiltering;
 @code {
-    public List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList();
+    public List<Item> Items = Item.GetAllItems();
     public List<Item> RecommendationItems = new();
     public static AdvertisementDetailComponent? AdvertisementDetail = new();
     public static MainPageSettings MainPage = new();
@@ -20,10 +20,10 @@
         if (CurUser == null || Items == null) return;
         if (CurUser.ViewingHistory == null) CurUser.ViewingHistory = new();
         var user = CurUser;
-        recomSystem.breeds = BreedCollection.Find(new BsonDocument()).ToList();
+        //recomSystem.breeds = BreedCollection.Find(new BsonDocument()).ToList();
         recomSystem.items = Items;
-        recomSystem.users = UserCollection.Find(new BsonDocument()).ToList();
-        recomSystem.properties_values = PropertyValueCollection.Find(new BsonDocument()).ToList();
+        //recomSystem.users = UserCollection.Find(new BsonDocument()).ToList();
+        //recomSystem.properties_values = PropertyValueCollection.Find(new BsonDocument()).ToList();
         RecommendationItems = recomSystem.Recommend();
         //RecommendationItems = recomSystem.TreeProximityRecommend();
         //RecommendationItems = recomSystem.EuclideanDistanceRecommend(); //recomSystem.TreeProximityRecommend();

@@ -12,63 +12,12 @@
         public static double MAX_SIZE_DIFFERENCE { get; } = 2;
         static ItemHelper()
         {
-            //BreedsSimilarity = new[,]
-            //{
-            //    { 1, 0.2, 0.1, 0, 0, 0 }, // Мейн-Кун
-            //    { 0.2, 1, 0.3, 0, 0, 0 }, // Британская
-            //    { 0.1, 0.3, 1, 0, 0, 0 }, // Другая (кот)
-            //    { 0, 0, 0, 1, 0.1, 0.2 }, // Мопс
-            //    { 0, 0, 0, 0.1, 1, 0.6 }, // Нем овчарка
-            //    { 0, 0, 0, 0.2, 0.6, 1 }, // Другая (собака)
-            //};
-
-            //ColorsSimilarity = new[,]
-            //{
-            //    { 1, 0, 0.1, 0, 0, 0, 0 }, // white
-            //    { 0, 1, 0.3, 0, 0, 0, 0 }, // black
-            //    { 0.1, 0.3, 1, 0, 0, 0, 0.6 }, // gray
-            //    { 0, 0, 0, 1, 0.6, 0.5, 0 }, // рыжий
-            //    { 0, 0, 0, 0.6, 1, 0.3, 0 }, // brown
-            //    { 0, 0, 0, 0.5, 0.3, 1, 0 }, // бежевый
-            //    { 0, 0, 0.6, 0, 0, 0, 1 }, // blue
-            //};
             BreedsSimilarity = BreedSimilarity.ConvertToDoubleMatrix(BreedSimilarity.GetAllBreedsSimilarity(), Breed.GetAllBreeds());
-            ColorsSimilarity = ColorSimilarity.ConvertToDoubleMatrix(ColorSimilarity.GetAllColorsSimilarity()); // Item.GetAllColors()
+            ColorsSimilarity = ColorSimilarity.ConvertToDoubleMatrix(ColorSimilarity.GetAllColorsSimilarity());
             SizesSimilarity = SizeSimilarity.ConvertToDoubleMatrix(SizeSimilarity.GetAllSizesSimilarity());
         }
         public static double GetSizesSimilarity(int size1, int size2)
         {
-            //// Приведем размеры к нижнему регистру для удобства сравнения
-            //size1 = size1.ToLower();
-            //size2 = size2.ToLower();
-
-            //// Проверяем сходство размеров
-            //if (size1 == size2)
-            //{
-            //    // Если размеры полностью совпадают
-            //    return 1.0;
-            //}
-            //else if ((size1 == "мелкий" && size2 == "средний") || (size1 == "средний" && size2 == "мелкий"))
-            //{
-            //    // Если размеры отличаются на один уровень (мелкий и средний)
-            //    return 0.5;
-            //}
-            //else if ((size1 == "мелкий" && size2 == "крупный") || (size1 == "крупный" && size2 == "мелкий"))
-            //{
-            //    // Если размеры отличаются на два уровня (мелкий и крупный)
-            //    return 0.2;
-            //}
-            //else if ((size1 == "средний" && size2 == "крупный") || (size1 == "крупный" && size2 == "средний"))
-            //{
-            //    // Если размеры отличаются на один уровень (средний и крупный)
-            //    return 0.7;
-            //}
-            //else
-            //{
-            //    // Если размеры полностью различны
-            //    return 0.0;
-            //}
-
             return SizesSimilarity[size1, size2];
         }
         public static double GetColorsSimilarity(int[] colors1, int[] colors2)
@@ -84,7 +33,7 @@
                 for (var j = 0; j < colors2.Length; j++)
                 {
                     similarityMatrix[i, j] =
-                        ColorsSimilarity[(int)colors1[i], colors2[j]];
+                        ColorsSimilarity[colors1[i], colors2[j]];
                     // Суммируем общее значение схожести.
                     similarity += similarityMatrix[i, j];
 

@@ -44,7 +44,7 @@ namespace HomelessAnimalsDiplom.Models
                     // Добавляем значения 0 для всех имеющихся пород в SimilarityValues
                     foreach (var bs in allBreedsSimilarity)
                     {
-                        if (bs.AnimalBreed != newBreed)
+                        if (bs.AnimalBreed != newBreed && !bs.SimilarityValues.ContainsKey(newBreed))
                         {
                             bs.SimilarityValues.Add(newBreed, 0);
 

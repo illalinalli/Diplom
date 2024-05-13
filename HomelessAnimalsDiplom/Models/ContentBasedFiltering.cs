@@ -1,24 +1,19 @@
 ﻿using static HomelessAnimalsDiplom.Models.Database;
 using static HomelessAnimalsDiplom.Controllers.HomeController;
-
 using MongoDB.Bson;
 using MongoDB.Driver;
-
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace HomelessAnimalsDiplom.Models
 {
-    
     public class ContentBasedFiltering
     {
         public List<Item> items;
-        public List<User> users;
-        public List<Breed> breeds;
-        public List<PropertyValue> properties_values;
-
-        List<PropertyValue> GetAllProperties()
-        {
-            return PropertyValueCollection.Find(new BsonDocument()).ToList();
-        }
+      
+        //List<PropertyValue> GetAllProperties()
+        //{
+        //    return PropertyValueCollection.Find(new BsonDocument()).ToList();
+        //}
         // Метод для получения родителей элемента из дерева
         private List<string> GetParentsFromNode(Node node, Item item)
         {
@@ -39,12 +34,6 @@ namespace HomelessAnimalsDiplom.Models
         // Метод для поиска узла в дереве по item
         private Node FindNodeInTree(Node node, string name, Item item)
         {
-            //if (node.Name == name)
-            //{
-            //    //return node;
-                
-            //}
-
             if (node.Item != null && node.Item.Id == item.Id)
             {
                 return node;
@@ -58,7 +47,6 @@ namespace HomelessAnimalsDiplom.Models
                     return foundNode;
                 }
             }
-
             return null;
         }
 
@@ -69,7 +57,6 @@ namespace HomelessAnimalsDiplom.Models
         public List<Item> TreeProximityRecommend()
         {
             var tree = new TreeBuilder();
-            var a = CurUser;
             // Получаем предпочтения текущего пользователя.
             var currentFavorites = items.Where(item => CurUser.Favorites.Contains(item.Id));
 
@@ -140,9 +127,8 @@ namespace HomelessAnimalsDiplom.Models
         /// <returns></returns>
         public List<Item> EuclideanDistanceRecommend()
         {
-            var a = CurUser;
             // Получаем предпочтения текущего пользователя.
-            var currentFavorites = this.items.Where(item => CurUser.Favorites.Contains(item.Id));
+            var currentFavorites = items.Where(item => CurUser.Favorites.Contains(item.Id));
 
             var favoriteItems = currentFavorites.Select(favorite =>
                 items.Find(item => item.Id == favorite.Id)).ToList();
@@ -211,8 +197,13 @@ namespace HomelessAnimalsDiplom.Models
         public List<Item> Recommend()
         {
             var tree = new TreeBuilder();
+            // Подгружаем коэффициенты из базы.
+            var allCoefficients = CoefficientAdjuster.GetAllCoefficients();
+            double euclideanCoeff = allCoefficients.FirstOrDefault(x => x.IsCommonResult && !x.IsTree).CoefficientValue;
+            double treeCoeff = allCoefficients.FirstOrDefault(x => x.IsCommonResult && x.IsTree).CoefficientValue;
+            if (euclideanCoeff == null || treeCoeff == null) return null;
             // Получаем предпочтения текущего пользователя.
-            var currentFavorites = this.items.Where(item => CurUser.Favorites.Contains(item.Id));
+            var currentFavorites = items.Where(item => CurUser.Favorites.Contains(item.Id));
 
             var favoriteItems = currentFavorites.Select(favorite =>
                 items.Find(item => item.Id == favorite.Id)).ToList();
@@ -241,7 +232,7 @@ namespace HomelessAnimalsDiplom.Models
                     // Используем евклидово расстояние (составляет 70% в итоговом значении)
                     // и близость по дереву (30%) для получения итогового сходства пород.
                     similarityMatrix[i, j] =
-                        (1 - euclideanDistance) * 0.7 + treeProximity * 0.3;
+                        (1 - euclideanDistance) * euclideanCoeff + treeProximity * treeCoeff;
                 }
             }
 

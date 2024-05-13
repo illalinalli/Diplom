@@ -16,10 +16,10 @@
     public static string selectedBreedValue = "Порода";
     public static string selectedColorValue = "Окрас";
 
-    public static AnimalType animalType = new();
-    public static Breed breed = new();
+    public static AnimalType animalType { get; set; }
+    public static Breed breed { get; set; }
     public static List<Breed> breeds = new();
-    public static PropertyValue propertyValue = new();
+    public static PropertyValue propertyValue { get; set; }
 
     List<PropertyValue> AllColors = new();
 
@@ -75,7 +75,14 @@
                 <form class="d-flex flex-column flex-md-row align-items-center">
                     <div class="col-md-4 mb-3">
                         <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @selectedTypeValue
+                            @if (animalType == null)
+                            {
+                                @selectedTypeValue
+                            }
+                            else
+                            {
+                                @animalType.Name
+                            }
                         </button>
                         <ul class="dropdown-menu">
                             @foreach (var aType in animalTypes)
@@ -108,9 +115,9 @@
                         </ul>
                     </div>
                 </form>
-                <div class="row justify-content-center">
+               @* <div class="row justify-content-center">
                     <a class="btn btn-dark" style="font-size: small; min-width: 200px; color: white; border-color: #d90429; background-color: #d90429;" @onclick="NavigateToSearchView">Поиск</a>
-                </div>
+                </div>*@
             </div>
         </div>
     </div>

@@ -28,43 +28,40 @@ namespace HomelessAnimalsDiplom.Models
             List<PropertyValue> colors = Item.GetAllColors();
             List<ColorSimilarity> res = new();
 
-            
-                // Находим новые породы, для которых не существует записей схожести
-                var newColors = colors.Where(c => allColorsSimilarity.All(cs => cs.Color.Id != c.Id)).ToList();
-                if (newColors != null || newColors.Count() > 0)
+            // Находим новые породы, для которых не существует записей схожести
+            var newColors = colors.Where(c => allColorsSimilarity.All(cs => cs.Color.Id != c.Id)).ToList();
+            if (newColors != null || newColors.Count() > 0)
+            {
+                // Добавляем новые породы в матрицу
+                foreach (var newColor in newColors)
                 {
-                    // Добавляем новые породы в матрицу
-                    foreach (var newColor in newColors)
+                    ColorSimilarity newColorSimilarity = new ColorSimilarity
                     {
-                        ColorSimilarity newColorSimilarity = new ColorSimilarity
-                        {
-                            Color = newColor
-                        };
-                        allColorsSimilarity.Add(newColorSimilarity);
+                        Color = newColor
+                    };
+                    allColorsSimilarity.Add(newColorSimilarity);
 
-                        // Добавляем значения 0 для всех имеющихся пород в SimilarityValues
-                        foreach (var cs in allColorsSimilarity)
+                    // Добавляем значения 0 для всех имеющихся пород в SimilarityValues
+                    foreach (var cs in allColorsSimilarity)
+                    {
+                        if (cs.Color != newColor)
                         {
-                            if (cs.Color != newColor)
-                            {
-                                cs.SimilarityValues.TryAdd(newColor, 0);
+                            cs.SimilarityValues.TryAdd(newColor, 0);
 
-                            }
-                            else
+                        }
+                        else
+                        {
+                            if (cs.SimilarityValues.Count() == 0)
                             {
-                                if (cs.SimilarityValues.Count() == 0)
-                                {
-                                    colors.ForEach(b => cs.SimilarityValues.Add(b, 0));
-                                }
+                                colors.ForEach(b => cs.SimilarityValues.Add(b, 0));
                             }
                         }
                     }
-                    //
                 }
-                // Добавляем все записи схожести в результат
-                res.AddRange(allColorsSimilarity);
-            
-
+                //
+            }
+            // Добавляем все записи схожести в результат
+            res.AddRange(allColorsSimilarity);
             return res;
         }
 

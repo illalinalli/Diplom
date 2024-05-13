@@ -35,10 +35,10 @@ namespace HomelessAnimalsDiplom.Models
 
         static double GetSizesSimilarity(Item item1, Item item2)
         {
-            var simSize = ItemHelper.GetSizesSimilarity(item1.GetSizeNum(item1.GetBreed()), item2.GetSizeNum(item2.GetBreed()));
-            var size1 = item1.GetBreedSize();
-            var size2 = item2.GetBreedSize();
-
+            var simSize = ItemHelper.GetSizesSimilarity(
+                item1.GetSizeNum(item1.GetBreed()), 
+                item2.GetSizeNum(item2.GetBreed())
+                );
             return simSize; // size1 == size2 ? 1 : 0
         }
         static double GetColorsSimilarity(Item item1, Item item2)
@@ -62,8 +62,7 @@ namespace HomelessAnimalsDiplom.Models
             var a = (double)commonColors / totalColors;
             return a; // simColors > 0.5? 1 : 0
         }
-        public static double CalcTreeProximity(string[] parentList1, string[] parentList2,
-            Item item1 = null, Item item2 = null)
+        public static double CalcTreeProximity(string[] parentList1, string[] parentList2, Item item1 = null, Item item2 = null)
         {
             if (parentList1 == null)
             {
@@ -76,13 +75,16 @@ namespace HomelessAnimalsDiplom.Models
             }
 
             double result = 0.0;
+            var allCoefficients = CoefficientAdjuster.GetAllCoefficients();
+            double sizeCoeff = allCoefficients.FirstOrDefault(x => x.IsTree && x.IsSize && !x.IsCommonResult && !x.IsColor).CoefficientValue;
+            double colorCoeff = allCoefficients.FirstOrDefault(x => x.IsTree && !x.IsSize && !x.IsCommonResult && x.IsColor).CoefficientValue;
             var commonDepth = Math.Min(parentList1.Length, parentList2.Length);
-           
+
             if (item1 != null && item2 != null)
             {
                 var sizeSimilarity = GetSizesSimilarity(item1, item2);
                 double colorsSimilarity = GetColorsSimilarity(item1, item2);
-                result = 0.6 * sizeSimilarity + 0.4 * colorsSimilarity; // 0.5 * в файлик с настройками в конфиги
+                result = sizeCoeff * sizeSimilarity + colorCoeff * colorsSimilarity; // 0.5 * в файлик с настройками в конфиги
             }
 
             var commonParents = parentList1.Zip(parentList2, (p1, p2) => p1 == p2).Count(c => c);

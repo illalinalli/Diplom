@@ -1,6 +1,7 @@
 ﻿using HomelessAnimalsDiplom.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
+using System.Drawing;
 using static HomelessAnimalsDiplom.Views.Shared.Components.SearchComponent;
 
 namespace HomelessAnimalsDiplom.Controllers
@@ -14,11 +15,10 @@ namespace HomelessAnimalsDiplom.Controllers
     {
         public IActionResult SearchView()
         {
-            SearchItem searchItem = new SearchItem() { 
-                Type = animalType.Id,
-                Breed = breed.Id,
-                Color = propertyValue.Id
-            };
+            SearchItem searchItem = new();
+            //Type = animalType.Id,
+            //    Breed = breed.Id,
+            //    Color = propertyValue.Id
             return View("SearchView", searchItem);
         }
     }

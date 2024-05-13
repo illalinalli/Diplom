@@ -15,13 +15,13 @@ namespace HomelessAnimalsDiplom.Models
         public static IMongoCollection<Item>? ItemCollection;
         public static IMongoCollection<Breed>? BreedCollection;
         public static IMongoCollection<AnimalType>? AnimalTypeCollection;
-        public static IMongoCollection<PropertyType> PropertyTypeCollection;
+        public static IMongoCollection<PropertyType>? PropertyTypeCollection;
         public static IMongoCollection<PropertyValue>? PropertyValueCollection;
         public static IMongoCollection<BreedSimilarity>? BreedSimilarityCollection;
         public static IMongoCollection<ColorSimilarity>? ColorSimilarityCollection;
         public static IMongoCollection<SizeSimilarity>? SizeSimilarityCollection;
-
-        //public static List<Item>? PublicationLeafCollection;
+        public static IMongoCollection<CoefficientAdjuster>? CoefficientAdjusterCollection;
+       
         public static string GetHash(string password)
         {
             var sha = System.Security.Cryptography.SHA1.Create();
@@ -83,6 +83,7 @@ namespace HomelessAnimalsDiplom.Models
             BreedSimilarityCollection = DB.GetCollection<BreedSimilarity>("BreedSimilarity");
             ColorSimilarityCollection = DB.GetCollection<ColorSimilarity>("ColorSimilarity");
             SizeSimilarityCollection = DB.GetCollection<SizeSimilarity>("SizeSimilarity");
+            CoefficientAdjusterCollection = DB.GetCollection<CoefficientAdjuster>("CoefficientAdjuster");
             SetBreedsNum();
             SetColorsNum();
             SetSizesNum();

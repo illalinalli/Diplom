@@ -13,19 +13,34 @@
 @using System.Web;
 @code {
     public SearchComponent? Search;
-    List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
+    List<AnimalType> AnimalTypes = new();
+    AnimalType SelectedType;
     public static List<Item> Result;
     public AdvertisementDetailComponent AdvertisementDetail = new();
+    List<Item> Items = new();
+    List<Breed> Breeds = new();
+    Breed SelectedBreed = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        AnimalTypes = AnimalType.GetAnimalTypes();
+        Items = ItemCollection.Find(new BsonDocument()).ToList();
+        SelectedType = new();
+        //Breeds = Breed.GetAllBreeds();
+        FindItems();
+    }
 
     void AnimalTypeChanged(ObjectId id)
     {
-        animalType = AnimalTypeCollection.Find(x => x.Id == id).FirstOrDefault();
-
+        //animalType = AnimalTypeCollection.Find(x => x.Id == id).FirstOrDefault();
+        SelectedType = AnimalTypes.FirstOrDefault(x => x.Id == id);
         if (animalType.Id != ObjectId.Empty)
         {
-            breeds = BreedCollection
-             .Find(x => x.AnimalTypeRef == animalType.Id)
-             .ToList();
+            Breeds = Breed.GetAllBreeds().FindAll(x => x.AnimalTypeRef == SelectedType.Id);
+            //   breeds = BreedCollection
+            //.Find(x => x.AnimalTypeRef == animalType.Id)
+            //.ToList();
         }
 
         selectedTypeValue = animalType.Name;
@@ -51,20 +66,27 @@
         //selectedColorValue = propertyValues.FirstOrDefault(x => x.Id == id).Name;
         StateHasChanged();
     }
-    protected override void OnInitialized()
+    bool colorIsEmpty; // false
+    bool typeIsEmpty;
+    bool breedIsEmpty;
+    public void FindItems()
     {
-        base.OnInitialized();
-        FindItems();
-    }
+        if (CurUser == null) return;
 
-    public static void FindItems()
-    {
-        List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList().FindAll(x => x.UserRef != CurUser.Id);
         Result = new();
-        bool colorIsEmpty; // false
-        bool typeIsEmpty;
-        bool breedIsEmpty;
-        if (propertyValue.Id == ObjectId.Empty)
+        var a = propertyValue;
+        var b = animalType;
+        var c = breed;
+        var d = selectedTypeValue;
+        if (selectedTypeValue == null)
+        {
+            typeIsEmpty = true;
+        }
+        else
+        {
+            typeIsEmpty = false;
+        }
+        if (propertyValue == null)
         {
             colorIsEmpty = true;
         }
@@ -73,7 +95,7 @@
             colorIsEmpty = false;
         }
 
-        if (animalType.Id == ObjectId.Empty)
+        if (animalType == null)
         {
             typeIsEmpty = true;
         }
@@ -82,7 +104,7 @@
             typeIsEmpty = false;
         }
 
-        if (breed.Id == ObjectId.Empty)
+        if (breed == null)
         {
             breedIsEmpty = true;
         }
@@ -122,7 +144,33 @@
             && x.Properties.Contains(propertyValue.Id));
         }
     }
-  
+
+    //public static void FindItems()
+    //{
+    //    if (CurUser == null) return;
+    //    List<Item> filteredItems = ItemCollection.Find(new BsonDocument())
+    //        .ToList()
+    //        .FindAll(x => x.UserRef != CurUser.Id);
+    
+    //    Result = new List<Item>();
+
+    //    // Упрощенное определение пустоты свойств
+    //    bool colorIsEmpty = propertyValue.Id == ObjectId.Empty;
+    //    bool typeIsEmpty = animalType.Id == ObjectId.Empty;
+    //    bool breedIsEmpty = breed.Id == ObjectId.Empty;
+
+    //    // Использование LINQ для фильтрации элементов
+    //    Result = filteredItems.Where(x =>
+    //    {
+    //        return
+    //            (breedIsEmpty && typeIsEmpty && colorIsEmpty) ||
+    //            (!typeIsEmpty && breedIsEmpty && colorIsEmpty && BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id) ||
+    //            (!typeIsEmpty && !breedIsEmpty && colorIsEmpty && x.BreedRef == breed.Id) ||
+    //            (!typeIsEmpty && !breedIsEmpty && !colorIsEmpty && x.BreedRef == breed.Id && x.Properties.Contains(propertyValue.Id)) ||
+    //            (!typeIsEmpty && breedIsEmpty && !colorIsEmpty && x.Properties.Contains(propertyValue.Id));
+    //    }).ToList();
+    //}
+
   
     public void ShowDetails(Item item)
     {
@@ -134,10 +182,15 @@
         if (CurUser.ViewingHistory == null) return false;
         if (CurUser.ViewingHistory.FirstOrDefault(x => x.ItemId == item.Id) != null) return true;
         return false;
+
+        // @onclick="@(e => AnimalTypeChanged(aType.Id))"
     }
 }
-
-<div class="container mt-3 pt-3 mb-5" style="font-size: medium;">
+<SearchComponent @ref="Search" />
+<div class="row justify-content-center">
+    <a class="btn btn-dark" style="font-size: small; min-width: 200px; color: white; border-color: #d90429; background-color: #d90429;" @onclick="FindItems">Поиск</a>
+</div>
+@*<div class="container mt-3 pt-3 mb-5" style="font-size: medium;">
     <div class="col">
         <div class="row mb-4" style="font-weight:600;">Поиск объявлений</div>
         <div class="row justify-content-center">
@@ -148,9 +201,9 @@
                             @selectedTypeValue
                         </button>
                         <ul class="dropdown-menu">
-                            @foreach (var aType in animalTypes)
+                            @foreach (var aType in AnimalTypes)
                             {
-                                <li class="dropdown-item" value="@aType.Id" style="font-size: small; width: 150px;" @onclick="@(e => AnimalTypeChanged(aType.Id))">@aType.Name</li>
+                                <li class="dropdown-item" value="@aType.Id" @onclick="@(e => AnimalTypeChanged(aType.Id))" style="font-size: small; width: 150px;">@aType.Name</li>
                             }
                         </ul>
                     </div>
@@ -159,7 +212,7 @@
                             @selectedBreedValue
                         </button>
                         <ul class="dropdown-menu">
-                            @foreach (var b in breeds)
+                            @foreach (var b in Breeds)
                             {
                                 <li class="dropdown-item" value="@b.Id" style="font-size: small; width: 150px;" @onclick="@(e => BreedChanged(@b.Id))">@b.Name</li>
                             }
@@ -184,47 +237,40 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col" style="font-weight:600; font-size: medium;">Результат поиска</div>
     </div>
     <div class="row">
         <div class="col">
-            @if (Result.Count != 0)
+            @if (Result != null && Result.Count != 0)
             {
-                @if (Result.Count() != 0)
+                foreach (var item in Result)
                 {
-                    foreach (var item in Result)
+                    if (item.Images != null)
                     {
-                        if (item.Images != null)
-                        {
-                            <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
-                                <div class="card" style="@(IsWatchedItem(item).StrIf("opacity: 0.65;"))  width: 24rem;">
-                                    @if (item.Images?.Count != 0)
-                                    {
-                                        <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(item.Images.First())}")" alt="Image" class="d-block w-100 card-img">
-                                    }
-                                    @if (IsWatchedItem(item))
-                                    {
-                                        <div style="position: absolute; top: 10px; right: 10px; background-color: #3c4246a6; opacity: 1; color: white; padding: 5px; border-radius: 5px; width: auto;">
-                                            <span style="font-size: 14px; font-weight: 400; letter-spacing: 0.03em;">Просмотрено 👁</span>
-                                        </div>
-                                    }
-                                    <div class="card-body">
-                                        <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
-                                        <div class="card-button-container">
-                                            <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="()=>ShowDetails(item)">Подробнее...</button>
-                                        </div>
+                        <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
+                            <div class="card" style="@(IsWatchedItem(item).StrIf("opacity: 0.65;"))  width: 24rem;">
+                                @if (item.Images?.Count != 0)
+                                {
+                                    <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(item.Images.First())}")" alt="Image" class="d-block w-100 card-img">
+                                }
+                                @if (IsWatchedItem(item))
+                                {
+                                    <div style="position: absolute; top: 10px; right: 10px; background-color: #3c4246a6; opacity: 1; color: white; padding: 5px; border-radius: 5px; width: auto;">
+                                        <span style="font-size: 14px; font-weight: 400; letter-spacing: 0.03em;">Просмотрено 👁</span>
+                                    </div>
+                                }
+                                <div class="card-body">
+                                    <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
+                                    <div class="card-button-container">
+                                        <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="()=>ShowDetails(item)">Подробнее...</button>
                                     </div>
                                 </div>
                             </div>
-                        }
+                        </div>
                     }
-                }
-                else
-                {
-                    <h5 style="color: gray;">Здесь появятся ваши избранные публикации.</h5>
                 }
             }
             else
