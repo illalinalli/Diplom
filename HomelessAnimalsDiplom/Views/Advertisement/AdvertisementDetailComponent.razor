@@ -33,15 +33,13 @@
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    //public event Action? OnUpdateMainPage;
-   // public event Action? OnUpdateFavPage;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        string currentUrl = NavigationManager.Uri;
-        var last = currentUrl.Split("/").LastOrDefault();
-        ShowComponent = last == "FavoritesPage" ? true : false;
+        //string currentUrl = NavigationManager.Uri;
+        //var last = currentUrl.Split("/").LastOrDefault();
+        //ShowComponent = last == "FavoritesPage" ? true : false;
     }
 
     public void ShowDialog(Item item, Action onYes, Action onClose)
@@ -57,11 +55,7 @@
             }
             isFavorite = CurUser.Favorites.Any(x => x == selectedItem.Id);
         }
-        //properties = new();
-        //foreach (var p in item.Properties)
-        //{
-        //    properties.Add(propertyValues.FirstOrDefault(x => x.Id == p));
-        //}
+       
         StateHasChanged();
     }
 
@@ -81,7 +75,6 @@
             });
         }
     }
-
 
     void Close()
     {
@@ -186,25 +179,12 @@
                         @if (properties != null)
                         {
                             <h4 class="decription-item">Пол: @properties.FirstOrDefault(x => x.PropTypeRef == new ObjectId("658ab0418a4dcfd166a80344")).Name</h4>
-                            @*<h4>Окрас: </h4>
-                            @foreach (var a in properties.FindAll(x => x.PropTypeRef == new ObjectId("658ab0a38a4dcfd166a80346")))
-                            {
-                                <div style="font-size: small; font-weight: 500">@a.Name</div>
-                            }*@
+                          
                         }
                         <h2>Описание</h2>
                         <h4 class="decription-item">@selectedItem.LongDescription</h4>
 
                     }
-                   @* @if (popupShown)
-                    {
-                        <h5 class="popup-call">Вы сделали дозвон в Азербайджан. Скоро вам перезвонят.</h5>
-                        //Thread.Sleep(7000);
-                    }*@
-                   @* @if (popupShown) {
-                        
-                        HoldPopup();
-                    }*@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary-outline" style="font-size: small; flex: 1; background-color: forestgreen; color: white;" @onclick="Call">Позвонить</button>

@@ -149,8 +149,73 @@
         StateHasChanged();
     }
 }
+<div class="row justify-content-center pb-3">
+    <div class="bordered card-create-ad">
+        <div class="main-page-recom-title create-ad-title">Создать объявление</div>
+        <div class="mb-3">
+            <label class="label-txt">Название публикации:</label>
+            <input type="text" class="form-control input-form-txt" @onchange="GetTitle">
+        </div>
+        <div class="mb-3">
+            <label class="label-txt">Вид животного:</label>
+            <select class="form-control input-form-txt" value="@animalType.Id" @onchange="HandleAnimalTypeChange">
+                @foreach (var t in animalTypes.OrderBy(x => x.Name))
+                {
+                    <option value="@t.Id">@t.Name</option>
+                }
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="label-txt">Порода животного:</label>
+            <select class="form-control input-form-txt" value="@breed.Id" @onchange="HandleAnimalBreedChange">
+                @if (breeds != null)
+                {
+                    @foreach (var b in breeds.OrderBy(x => x.Name))
+                    {
+                        <option value="@b.Id">@b.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="mb-3 btn-create-ad">
+            <label class="label-txt">Пол животного:</label>
+            @foreach (var s in AllSexes)
+            {
+                <div class="mb-1">
+                    <input class="form-check-input" type="radio" name="radios" id="@s.Id" 
+                        checked="@IsChecked(s.Id)" @onchange="e => HandleCheckSex(e, s)">
+                    <label class="form-check-label" for="@s.Id">@s.Name</label>
+                </div>
+            }
+        </div>
+        <div class="mb-3 btn-create-ad">
+            <label class="label-txt">Окрас животного:</label>
+            @foreach (var s in AllColors)
+            {
+                <div class="mb-1">
+                    <input class="form-check-input" type="checkbox" name="boxes" id="@s.Id" value="@s.Name"
+                       checked="@IsChecked(s.Id)" @onchange="e => HandleCheckColors(e, s)">
+                    <label class="form-check-label" for="@s.Id">@s.Name</label>
+                </div>
+            }
+        </div>
+        <div class="mb-3">
+            <label class="label-txt">Описание к публикации:</label>
+            <textarea class="form-control input-form-txt" style="resize: none;" id="itemLongDis" rows="3" @onchange="GetLongTxt" />
+        </div>
+        <div class="mb-3">
+            <label class="label-txt">Загрузите фотографии животного:</label>
+            <InputFile class="form-control input-form-txt" type="file" id="formFileMultiple" multiple OnChange="GetAnimalPhotos" />
+        </div>
+        <div class="mb-3" style="padding: 20px 100px 20px 100px;">
+            <a href="/Home/MainPage" class="btn btn-outline-primary save-btn-create-ad mb-2" @onclick="Save">Опубликовать</a>
+        </div>
+    </div>
 
-<div class="container">
+</div>
+
+
+@*<div class="container">
     <div class="row pt-3">
         <div class="col-12 ad-text">
             <h3>Создать объявление</h3>
@@ -240,4 +305,4 @@
             <a href="/Home/MainPage" class="btn btn-outline-primary mb-2" @onclick="Save">Опубликовать</a>
         </div>
     </div>
-</div>
+</div>*@

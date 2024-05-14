@@ -25,23 +25,22 @@
     }
    
 }
-
-<SearchComponent @ref="Search" />
-<div class="row justify-content-center">
-    <a class="btn btn-dark" 
-    style="font-size: small; min-width: 200px; color: white; border-color: #d90429; background-color: #d90429;" 
-    href="Search/SearchView">Поиск</a>
+<div class="row justify-content-center pb-3">
+    <div class="rounded-rectangle">
+        <p class="button-caption-search">Найди своего идеального питомца здесь!</p>
+        <a class="btn btn-dark search-btn" href="Search/SearchView">Поиск</a>
+        <img src="./pictures/cat-dog-main-page.png" class="img-main-page-card">
+    </div>
 </div>
-<div class="container-fluid">
+<div class="row justify-content-center bordered main-page-recommends pt-4">
     <div class="row mb-4">
-        <div class="col" style="font-weight:600; font-size: medium;">Рекомендации для вас</div>
+        <div class="col main-page-recom-title">Рекомендации для вас</div>
     </div>
     <div class="row">
         <div class="col">
             @if (CurUser != null)
             {
                 <RecommendationsComponent @ref="RecommendationsComp" />
-              
             }
             else
             {

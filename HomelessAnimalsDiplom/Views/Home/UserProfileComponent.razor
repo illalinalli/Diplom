@@ -27,10 +27,10 @@
 }
 @if (CurUser != null)
 {
-    <div class="container-fluid">
-        <h4 class="mb-4">Пользователь: @CurUser.Name</h4>
+    <h4 class="mb-4">Пользователь: @CurUser.Name</h4>
+    <div class="row justify-content-center bordered main-page-recommends pt-4">
         <div class="row mb-4">
-            <div class="col" style="font-weight:600; font-size: medium;">Мои объявления</div>
+            <div class="col main-page-recom-title">Мои объявления</div>
         </div>
         <div class="row">
             <div class="col">
@@ -39,7 +39,7 @@
                     foreach (var item in Items)
                     {
                         <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
-                            <div class="card" style="width: 24rem;">
+                            <div class="card card-item" style="width: 24rem;">
                                 @if (item.Images?.Count != 0)
                                 {
                                     <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(item.Images.First())}")" alt="Image" class="d-block w-100 card-img">
