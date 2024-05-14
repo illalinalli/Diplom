@@ -25,7 +25,7 @@
     {
         base.OnInitialized();
         AnimalTypes = AnimalType.GetAnimalTypes();
-        Items = ItemCollection.Find(new BsonDocument()).ToList();
+       // Items = Item.GetAllItems().FindAll(x => x.UserRef != CurUser.Id);
         SelectedType = new();
         //Breeds = Breed.GetAllBreeds();
         FindItems();
@@ -186,61 +186,11 @@
         // @onclick="@(e => AnimalTypeChanged(aType.Id))"
     }
 }
-<SearchComponent @ref="Search" />
-<div class="row justify-content-center">
-    <a class="btn btn-dark" style="font-size: small; min-width: 200px; color: white; border-color: #d90429; background-color: #d90429;" @onclick="FindItems">Поиск</a>
-</div>
-@*<div class="container mt-3 pt-3 mb-5" style="font-size: medium;">
-    <div class="col">
-        <div class="row mb-4" style="font-weight:600;">Поиск объявлений</div>
-        <div class="row justify-content-center">
-            <div class="col-xl-6 col-lg-8 col-md-10">
-                <form class="d-flex flex-column flex-md-row align-items-center">
-                    <div class="col-md-4 mb-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @selectedTypeValue
-                        </button>
-                        <ul class="dropdown-menu">
-                            @foreach (var aType in AnimalTypes)
-                            {
-                                <li class="dropdown-item" value="@aType.Id" @onclick="@(e => AnimalTypeChanged(aType.Id))" style="font-size: small; width: 150px;">@aType.Name</li>
-                            }
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @selectedBreedValue
-                        </button>
-                        <ul class="dropdown-menu">
-                            @foreach (var b in Breeds)
-                            {
-                                <li class="dropdown-item" value="@b.Id" style="font-size: small; width: 150px;" @onclick="@(e => BreedChanged(@b.Id))">@b.Name</li>
-                            }
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @selectedColorValue
-                        </button>
-                        <ul class="dropdown-menu">
-                            @foreach (var c in Item.GetAllColors().OrderBy(x => x.Name))
-                            {
-                            // href="/Search/SearchView"
-                                <li class="dropdown-item" value="@c.Id" style="font-size: small; width: 150px;" @onclick="@(e => ColorChanged(@c.Id))">@c.Name</li>
-                            }
-                        </ul>
-                    </div>
-                </form>
-                <div class="row justify-content-center">
-                    <a class="btn btn-dark" style="font-size: small; min-width: 200px; color: white; border-color: #d90429; background-color: #d90429;" @onclick="FindItems">Поиск</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>*@
-<div class="container-fluid">
+<SearchComponent @ref="Search"></SearchComponent>
+
+<div class="row justify-content-center bordered main-page-recommends pb-3 pt-3">
     <div class="row mb-4">
-        <div class="col" style="font-weight:600; font-size: medium;">Результат поиска</div>
+        <div class="col main-page-recom-title" style="font-weight:600; font-size: medium;">Результат поиска</div>
     </div>
     <div class="row">
         <div class="col">
@@ -251,7 +201,7 @@
                     if (item.Images != null)
                     {
                         <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
-                            <div class="card" style="@(IsWatchedItem(item).StrIf("opacity: 0.65;"))  width: 24rem;">
+                            <div class="card card-item" style="@(IsWatchedItem(item).StrIf("opacity: 0.65;"))  width: 24rem;">
                                 @if (item.Images?.Count != 0)
                                 {
                                     <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(item.Images.First())}")" alt="Image" class="d-block w-100 card-img">

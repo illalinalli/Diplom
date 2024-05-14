@@ -1,5 +1,6 @@
 ﻿@using HomelessAnimalsDiplom.Models;
 @using HomelessAnimalsDiplom.Views.Shared.Components;
+@using static HomelessAnimalsDiplom.Controllers.HomeController;
 @using Microsoft.AspNetCore.Components.Rendering;
 @using System.Globalization;
 @using HomelessAnimalsDiplom.Controllers;
@@ -10,7 +11,7 @@
 @using MongoDB.Driver;
 @inject NavigationManager NavigationManager
 @code {
-    public List<Item> Items = ItemCollection.Find(new BsonDocument()).ToList();
+    public List<Item> Items = new();
     List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
     public static string selectedTypeValue = "Вид";
     public static string selectedBreedValue = "Порода";
@@ -27,6 +28,11 @@
     {
         base.OnInitialized();
         AllColors = Item.GetAllColors();
+        if (CurUser != null)
+        {
+            Items = Item.GetAllItems().FindAll(x => x.UserRef != CurUser.Id);
+            
+        }
     }
 
     void AnimalTypeChanged(ObjectId id)
@@ -60,64 +66,62 @@
         selectedColorValue = propertyValue.Name;
         StateHasChanged();
     }
-    void NavigateToSearchView()
+    public List<Item> SearchResult;
+    void SearchItems()
     {
-        //FindAds();
-        NavigationManager.NavigateTo($"Search/SearchView?type={animalType.Id}&breed={breed.Id}&color={propertyValue.Id}", true);
+        
     }
 }
 
-<div class="container mt-3 pt-3 mb-5" style="font-size: medium;">
-    <div class="col">
-        <div class="row mb-4" style="font-weight:600;">Поиск объявлений</div>
-        <div class="row justify-content-center">
-            <div class="col-xl-6 col-lg-8 col-md-10">
-                <form class="d-flex flex-column flex-md-row align-items-center">
-                    <div class="col-md-4 mb-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @if (animalType == null)
-                            {
-                                @selectedTypeValue
-                            }
-                            else
-                            {
-                                @animalType.Name
-                            }
-                        </button>
-                        <ul class="dropdown-menu">
-                            @foreach (var aType in animalTypes)
-                            {
-                                <li class="dropdown-item" value="@aType.Id" style="font-size: small; width: 150px;" @onclick="@(e => AnimalTypeChanged(aType.Id))">@aType.Name</li>
-                            }
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @selectedBreedValue
-                        </button>
-                        <ul class="dropdown-menu">
-                            @foreach (var b in breeds)
-                            {
-                                <li class="dropdown-item" value="@b.Id" style="font-size: small; width: 150px;" @onclick="@(e => BreedChanged(@b.Id))">@b.Name</li>
-                            }
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @selectedColorValue
-                        </button>
-                        <ul class="dropdown-menu">
-                            @foreach (var c in AllColors.OrderBy(x => x.Name))
-                            {
-                            // href="/Search/SearchView"
-                                <li class="dropdown-item" value="@c.Id" style="font-size: small; width: 150px;" @onclick="@(e => ColorChanged(@c.Id))">@c.Name</li>
-                            }
-                        </ul>
-                    </div>
-                </form>
-               @* <div class="row justify-content-center">
-                    <a class="btn btn-dark" style="font-size: small; min-width: 200px; color: white; border-color: #d90429; background-color: #d90429;" @onclick="NavigateToSearchView">Поиск</a>
-                </div>*@
+<div class="row justify-content-center bordered main-page-recommends pb-3 pt-3" style="font-size: medium;">
+    <div class="mb-4 main-page-recom-title">Поиск объявлений</div>
+    <div class="row justify-content-center">
+        <div class="col-xl-6 col-lg-8 col-md-10">
+            <form class="d-flex flex-column flex-md-row align-items-center">
+                <div class="col-md-4 mb-3">
+                    <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        @if (animalType == null)
+                        {
+                            @selectedTypeValue
+                        }
+                        else
+                        {
+                            @animalType.Name
+                        }
+                    </button>
+                    <ul class="dropdown-menu">
+                        @foreach (var aType in animalTypes)
+                        {
+                            <li class="dropdown-item" value="@aType.Id" style="font-size: small; width: 150px;" @onclick="@(e => AnimalTypeChanged(aType.Id))">@aType.Name</li>
+                        }
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        @selectedBreedValue
+                    </button>
+                    <ul class="dropdown-menu">
+                        @foreach (var b in breeds)
+                        {
+                            <li class="dropdown-item" value="@b.Id" style="font-size: small; width: 150px;" @onclick="@(e => BreedChanged(@b.Id))">@b.Name</li>
+                        }
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        @selectedColorValue
+                    </button>
+                    <ul class="dropdown-menu">
+                        @foreach (var c in AllColors.OrderBy(x => x.Name))
+                        {
+                        // href="/Search/SearchView"
+                            <li class="dropdown-item" value="@c.Id" style="font-size: small; width: 150px;" @onclick="@(e => ColorChanged(@c.Id))">@c.Name</li>
+                        }
+                    </ul>
+                </div>
+            </form>
+            <div class="row justify-content-center">
+                <a class="btn btn-dark search-btn search-btn-page" @onclick="SearchItems">Найти</a>
             </div>
         </div>
     </div>

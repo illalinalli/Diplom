@@ -219,7 +219,7 @@ td:first-child, th:first-child {
 .card-create-ad {
     background-color: rgba(238, 220, 130, 0.6) !important;
     color: #7B5B32 !important;
-    border-color: rgba(238, 220, 130, 0.7) !important;
+    border-color: #7B5B32 !important;
 }
 
 .create-ad-title {
@@ -233,6 +233,7 @@ td:first-child, th:first-child {
 }
 .input-form-txt {
     font-size: medium !important;
+    border-color: #7B5B32 !important;
 }
 
 .save-btn-create-ad {
@@ -249,4 +250,12 @@ td:first-child, th:first-child {
 .save-btn-create-ad:hover {
     background-color: rgb(123, 91, 50) !important;
     color: white !important;
+}
+
+.search-btn-page {
+    left: 0% !important;
+    background-color: #EEDC82 !important;
+    color: #7B5B32 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
 }
