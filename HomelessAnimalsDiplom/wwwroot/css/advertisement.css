@@ -203,7 +203,9 @@ td:first-child, th:first-child {
 
 .card-item {
     width: 24rem !important;
+    max-width: 24rem !important;
     border-color: currentColor !important;
+    overflow: hidden !important;
 }
 
 .nav-link-main {
@@ -258,4 +260,20 @@ td:first-child, th:first-child {
     color: #7B5B32 !important;
     font-size: 15px !important;
     font-weight: 600 !important;
+}
+
+.title-card-all {
+    line-height: 1.2 !important; /* Adjust line height as needed */
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important; /* Number of lines to show */
+    -webkit-box-orient: vertical !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+
+    height: 18px; /* Ограничение высоты заголовка */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

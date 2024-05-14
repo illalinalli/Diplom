@@ -127,7 +127,7 @@
     void Save()
     {
         if (CurUser == null) return;
-        if (breed.Id == ObjectId.Empty)
+        if (!breeds.Contains(breed))
         {
             breed.Id = breeds.OrderBy(x => x.Name).First().Id;
         }

@@ -12,7 +12,8 @@
 @using MongoDB.Driver;
 @using System.Web;
 @code {
-    public SearchComponent? Search;
+    public static SearchComponent? Search = new();
+    public static SearchSettings SearchSettingsComp = new();
     List<AnimalType> AnimalTypes = new();
     AnimalType SelectedType;
     public static List<Item> Result;
@@ -25,153 +26,9 @@
     {
         base.OnInitialized();
         AnimalTypes = AnimalType.GetAnimalTypes();
-       // Items = Item.GetAllItems().FindAll(x => x.UserRef != CurUser.Id);
         SelectedType = new();
-        //Breeds = Breed.GetAllBreeds();
-        FindItems();
     }
 
-    void AnimalTypeChanged(ObjectId id)
-    {
-        //animalType = AnimalTypeCollection.Find(x => x.Id == id).FirstOrDefault();
-        SelectedType = AnimalTypes.FirstOrDefault(x => x.Id == id);
-        if (animalType.Id != ObjectId.Empty)
-        {
-            Breeds = Breed.GetAllBreeds().FindAll(x => x.AnimalTypeRef == SelectedType.Id);
-            //   breeds = BreedCollection
-            //.Find(x => x.AnimalTypeRef == animalType.Id)
-            //.ToList();
-        }
-
-        selectedTypeValue = animalType.Name;
-        selectedBreedValue = "Порода";
-        selectedColorValue = "Окрас";
-        breed = new();
-        propertyValue = new();
-        StateHasChanged();
-    }
-
-    void BreedChanged(ObjectId id)
-    {
-        breed = BreedCollection.Find(x => x.Id == id).FirstOrDefault();
-        selectedBreedValue = breed.Name;
-        selectedColorValue = "Окрас";
-        propertyValue = new();
-        StateHasChanged();
-    }
-
-    void ColorChanged(ObjectId id)
-    {
-        propertyValue.Id = id;
-        //selectedColorValue = propertyValues.FirstOrDefault(x => x.Id == id).Name;
-        StateHasChanged();
-    }
-    bool colorIsEmpty; // false
-    bool typeIsEmpty;
-    bool breedIsEmpty;
-    public void FindItems()
-    {
-        if (CurUser == null) return;
-
-        Result = new();
-        var a = propertyValue;
-        var b = animalType;
-        var c = breed;
-        var d = selectedTypeValue;
-        if (selectedTypeValue == null)
-        {
-            typeIsEmpty = true;
-        }
-        else
-        {
-            typeIsEmpty = false;
-        }
-        if (propertyValue == null)
-        {
-            colorIsEmpty = true;
-        }
-        else
-        {
-            colorIsEmpty = false;
-        }
-
-        if (animalType == null)
-        {
-            typeIsEmpty = true;
-        }
-        else
-        {
-            typeIsEmpty = false;
-        }
-
-        if (breed == null)
-        {
-            breedIsEmpty = true;
-        }
-        else
-        {
-            breedIsEmpty = false;
-        }
-
-        // всё пустое - ищем все публикации
-        if (breedIsEmpty && typeIsEmpty && colorIsEmpty)
-        {
-            Result = Items;
-        }
-        // добавить ещё в условия пользователя curUser != x.UserRef
-        if (!typeIsEmpty && breedIsEmpty && colorIsEmpty)
-        {
-            // только по типу
-            Result = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id);
-
-        }
-
-        if (!typeIsEmpty && !breedIsEmpty && colorIsEmpty)
-        {
-            Result = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
-            && x.BreedRef == breed.Id);
-        }
-
-        if (!typeIsEmpty && !breedIsEmpty && !colorIsEmpty)
-        {
-            Result = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
-            && x.BreedRef == breed.Id && x.Properties.Contains(propertyValue.Id));
-        }
-
-        if (!typeIsEmpty && breedIsEmpty && !colorIsEmpty)
-        {
-            Result = Items.FindAll(x => BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id
-            && x.Properties.Contains(propertyValue.Id));
-        }
-    }
-
-    //public static void FindItems()
-    //{
-    //    if (CurUser == null) return;
-    //    List<Item> filteredItems = ItemCollection.Find(new BsonDocument())
-    //        .ToList()
-    //        .FindAll(x => x.UserRef != CurUser.Id);
-    
-    //    Result = new List<Item>();
-
-    //    // Упрощенное определение пустоты свойств
-    //    bool colorIsEmpty = propertyValue.Id == ObjectId.Empty;
-    //    bool typeIsEmpty = animalType.Id == ObjectId.Empty;
-    //    bool breedIsEmpty = breed.Id == ObjectId.Empty;
-
-    //    // Использование LINQ для фильтрации элементов
-    //    Result = filteredItems.Where(x =>
-    //    {
-    //        return
-    //            (breedIsEmpty && typeIsEmpty && colorIsEmpty) ||
-    //            (!typeIsEmpty && breedIsEmpty && colorIsEmpty && BreedCollection.Find(b => b.Id == x.BreedRef).FirstOrDefault().AnimalTypeRef == animalType.Id) ||
-    //            (!typeIsEmpty && !breedIsEmpty && colorIsEmpty && x.BreedRef == breed.Id) ||
-    //            (!typeIsEmpty && !breedIsEmpty && !colorIsEmpty && x.BreedRef == breed.Id && x.Properties.Contains(propertyValue.Id)) ||
-    //            (!typeIsEmpty && breedIsEmpty && !colorIsEmpty && x.Properties.Contains(propertyValue.Id));
-    //    }).ToList();
-    //}
-
-  
     public void ShowDetails(Item item)
     {
         AdvertisementDetail.ShowDialog(item, null, null);
@@ -182,11 +39,15 @@
         if (CurUser.ViewingHistory == null) return false;
         if (CurUser.ViewingHistory.FirstOrDefault(x => x.ItemId == item.Id) != null) return true;
         return false;
-
-        // @onclick="@(e => AnimalTypeChanged(aType.Id))"
     }
+    public void UpdateResult(List<Item> res)
+    {
+        Result = res;
+        StateHasChanged();
+    }
+
 }
-<SearchComponent @ref="Search"></SearchComponent>
+<SearchComponent @ref="Search" SearchSettingsComp="this"></SearchComponent>
 
 <div class="row justify-content-center bordered main-page-recommends pb-3 pt-3">
     <div class="row mb-4">
@@ -213,7 +74,7 @@
                                     </div>
                                 }
                                 <div class="card-body">
-                                    <h5 class="card-title" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
+                                    <h5 class="card-title title-card-all" style="font-size: 15px; font-weight: 640;">@item.Title</h5>
                                     <div class="card-button-container">
                                         <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="()=>ShowDetails(item)">Подробнее...</button>
                                     </div>

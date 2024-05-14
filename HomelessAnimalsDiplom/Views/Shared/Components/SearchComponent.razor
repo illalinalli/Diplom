@@ -1,4 +1,5 @@
 ﻿@using HomelessAnimalsDiplom.Models;
+@using HomelessAnimalsDiplom.Views.Search;
 @using HomelessAnimalsDiplom.Views.Shared.Components;
 @using static HomelessAnimalsDiplom.Controllers.HomeController;
 @using Microsoft.AspNetCore.Components.Rendering;
@@ -11,7 +12,10 @@
 @using MongoDB.Driver;
 @inject NavigationManager NavigationManager
 @code {
+    [Parameter]
+    public SearchSettings SearchSettingsComp { get; set; }
     public List<Item> Items = new();
+    SearchSettings searchPage = new();
     List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
     public static string selectedTypeValue = "Вид";
     public static string selectedBreedValue = "Порода";
@@ -19,10 +23,12 @@
 
     public static AnimalType animalType { get; set; }
     public static Breed breed { get; set; }
-    public static List<Breed> breeds = new();
+    public List<Breed> breeds = new();
     public static PropertyValue propertyValue { get; set; }
 
     List<PropertyValue> AllColors = new();
+
+    public List<Item>? SearchResult;
 
     protected override void OnInitialized()
     {
@@ -31,7 +37,7 @@
         if (CurUser != null)
         {
             Items = Item.GetAllItems().FindAll(x => x.UserRef != CurUser.Id);
-            
+
         }
     }
 
@@ -41,35 +47,55 @@
 
         if (animalType.Id != ObjectId.Empty)
         {
-            breeds = BreedCollection
-             .Find(x => x.AnimalTypeRef == animalType.Id)
-             .ToList();
+            breeds = Breed.GetAllBreeds().FindAll(x => x.AnimalTypeRef == animalType.Id);
         }
 
         selectedTypeValue = animalType.Name;
         selectedBreedValue = "Порода";
-        breed = new();
-        propertyValue = new();
+        selectedColorValue = "Окрас";
+        breed = null;
+        propertyValue = null;
+        //breed = new();
+        //propertyValue = new();
         StateHasChanged();
     }
 
     void BreedChanged(ObjectId id)
     {
-        breed = BreedCollection.Find(x => x.Id == id).FirstOrDefault();
+        breed = breeds.FirstOrDefault(x => x.Id == id);
         selectedBreedValue = breed.Name;
         StateHasChanged();
     }
 
     void ColorChanged(ObjectId id)
     {
-        //propertyValue = propertyValues.FirstOrDefault(x => x.Id == id);
+        propertyValue = AllColors.FirstOrDefault(x => x.Id == id);
         selectedColorValue = propertyValue.Name;
         StateHasChanged();
     }
-    public List<Item> SearchResult;
+    
     void SearchItems()
     {
-        
+        if (CurUser == null) return;
+
+        SearchResult = Items.Where(item =>
+        {
+            if (animalType == null && breed == null && propertyValue == null)
+            {
+                return true; // Return true if no filters are applied
+            }
+
+            bool matchAnimalType = animalType == null || item.GetBreed().AnimalTypeRef == animalType.Id;
+            bool matchBreed = breed == null || item.BreedRef == breed.Id;
+            bool matchColor = propertyValue == null || item.HaveColor(propertyValue);
+
+            return matchAnimalType && matchBreed && matchColor;
+        }).ToList();
+
+        if (SearchSettingsComp != null)
+        {
+            SearchSettingsComp.UpdateResult(SearchResult);
+        }
     }
 }
 
@@ -80,14 +106,7 @@
             <form class="d-flex flex-column flex-md-row align-items-center">
                 <div class="col-md-4 mb-3">
                     <button class="btn btn-outline-secondary dropdown-toggle mb-2 mb-md-0 me-3" style="font-size: small; min-width: 150px;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        @if (animalType == null)
-                        {
                             @selectedTypeValue
-                        }
-                        else
-                        {
-                            @animalType.Name
-                        }
                     </button>
                     <ul class="dropdown-menu">
                         @foreach (var aType in animalTypes)

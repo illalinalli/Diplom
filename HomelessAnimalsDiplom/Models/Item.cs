@@ -25,7 +25,18 @@ namespace HomelessAnimalsDiplom.Models
 
         [BsonIgnore]
         public static Dictionary<ObjectId, int> ColorsNums { get; set; } = new();
-        
+        public bool HaveColor(PropertyValue propertyValue)
+        {
+            // this.Colors
+            foreach (var c in Colors)
+            {
+                if (c.Id == propertyValue.Id)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public AnimalType GetAnimalType()
         {
             var curBreed = GetBreed();
