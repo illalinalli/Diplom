@@ -56,6 +56,10 @@ namespace HomelessAnimalsDiplom.Models
         /// <returns></returns>
         public List<Item> TreeProximityRecommend()
         {
+            var allCoefficients = CoefficientAdjuster.GetAllCoefficients();
+            double itemsSimilarityCoeff = allCoefficients
+                 .FirstOrDefault(x => x.IsItemsSimilarityValue
+                 && !x.IsTree && !x.IsCommonResult && !x.IsSize && !x.IsColor).CoefficientValue;
             var tree = new TreeBuilder();
             // Получаем предпочтения текущего пользователя.
             var currentFavorites = items.Where(item => CurUser.Favorites.Contains(item.Id));
@@ -106,7 +110,7 @@ namespace HomelessAnimalsDiplom.Models
 
             // Отбираем те породы, сходство которых больше 40%, и сортируем их по убыванию.
             var recommendedIds = itemsSimilarity
-                .Where(itemSimilarity => itemSimilarity.Value > 0.5)
+                .Where(itemSimilarity => itemSimilarity.Value > itemsSimilarityCoeff)
                 .OrderByDescending(itemSimilarity =>
                     itemSimilarity.Value)
                 .Select(itemSimilarity => itemSimilarity.Key);
@@ -127,6 +131,11 @@ namespace HomelessAnimalsDiplom.Models
         /// <returns></returns>
         public List<Item> EuclideanDistanceRecommend()
         {
+            var allCoefficients = CoefficientAdjuster.GetAllCoefficients();
+            double itemsSimilarityCoeff = allCoefficients
+                .FirstOrDefault(x => x.IsItemsSimilarityValue 
+                && !x.IsTree && !x.IsCommonResult && !x.IsSize && !x.IsColor).CoefficientValue;
+
             // Получаем предпочтения текущего пользователя.
             var currentFavorites = items.Where(item => CurUser.Favorites.Contains(item.Id));
 
@@ -179,7 +188,7 @@ namespace HomelessAnimalsDiplom.Models
 
             // Отбираем те породы, сходство которых больше 40%, и сортируем их по убыванию.
             var recommendedIds = itemsSimilarity
-                .Where(itemSimilarity => itemSimilarity.Value > 0.7)
+                .Where(itemSimilarity => itemSimilarity.Value > itemsSimilarityCoeff)
                 .OrderByDescending(itemSimilarity =>
                     itemSimilarity.Value)
                 .Select(itemSimilarity => itemSimilarity.Key);
@@ -201,6 +210,8 @@ namespace HomelessAnimalsDiplom.Models
             var allCoefficients = CoefficientAdjuster.GetAllCoefficients();
             double euclideanCoeff = allCoefficients.FirstOrDefault(x => x.IsCommonResult && !x.IsTree).CoefficientValue;
             double treeCoeff = allCoefficients.FirstOrDefault(x => x.IsCommonResult && x.IsTree).CoefficientValue;
+            double itemsSimilarityCoeff = allCoefficients.FirstOrDefault(x => x.IsItemsSimilarityValue && !x.IsTree
+            && !x.IsCommonResult && !x.IsSize && !x.IsColor).CoefficientValue;
             if (euclideanCoeff == null || treeCoeff == null) return null;
             // Получаем предпочтения текущего пользователя.
             var currentFavorites = items.Where(item => CurUser.Favorites.Contains(item.Id));
@@ -256,10 +267,10 @@ namespace HomelessAnimalsDiplom.Models
 
             // Отбираем те породы, сходство которых больше 40%, и сортируем их по убыванию.
             var recommendedIds = itemsSimilarity
-                .Where(itemSimilarity => itemSimilarity.Value > 0.6)
+                .Where(itemSimilarity => itemSimilarity.Value > itemsSimilarityCoeff)
                 .OrderByDescending(itemSimilarity =>
                     itemSimilarity.Value)
-                .Select(itemSimilarity => itemSimilarity.Key);
+                .Select(itemSimilarity => itemSimilarity.Key).Take(5);
             List<Item> res = new();
             foreach (var recId in recommendedIds)
             {
@@ -291,11 +302,7 @@ namespace HomelessAnimalsDiplom.Models
             {
                 colorsNum2.Add(c2.GetColorNumber());
             }
-            //List<int> sizesNum1 = new();
-            //List<int> sizesNum2 = new();
 
-            //sizesNum1.Add(item1.GetSizeNum(item1.GetBreed()));
-            //sizesNum2.Add(item2.GetSizeNum(item2.GetBreed()));
             var a = item1.GetSizeNum(item1.GetBreed());
             var b = item2.GetSizeNum(item2.GetBreed());
 

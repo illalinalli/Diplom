@@ -59,7 +59,7 @@ namespace HomelessAnimalsDiplom.Models
             var simColors = ItemHelper.GetColorsSimilarity(colorsNum1.ToArray(), colorsNum2.ToArray());
             var commonColors = item1.Colors.Intersect(item2.Colors).Count();
             var totalColors = item1.Colors.Count() + item2.Colors.Count();
-            var a = (double)commonColors / totalColors;
+            var a = (double)commonColors / totalColors; // commonColors / ..
             return a; // simColors > 0.5? 1 : 0
         }
         public static double CalcTreeProximity(string[] parentList1, string[] parentList2, Item item1 = null, Item item2 = null)

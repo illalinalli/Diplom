@@ -175,7 +175,16 @@
                         </div>
 
                         <h2>О животном</h2>
-                        <h4 class="decription-item">Порода: @BreedCollection.Find(x => x.Id == selectedItem.BreedRef).FirstOrDefault().Name</h4>
+                        <h4 class="decription-item">Порода: @selectedItem.GetBreed().Name</h4>
+                        <h4 class="decription-item">Размер породы: @selectedItem.GetBreedSize().Name</h4>
+                        <h4 class="decription-item">Пол животного: @selectedItem.Sex.Name</h4>
+                        <h4 class="decription-item">
+                            Окрас животного:
+                            @foreach(var c in selectedItem.Colors) {
+                                var cTxt = c.Name + " ";
+                                @cTxt
+                            }
+                        </h4>
                         @if (properties != null)
                         {
                             <h4 class="decription-item">Пол: @properties.FirstOrDefault(x => x.PropTypeRef == new ObjectId("658ab0418a4dcfd166a80344")).Name</h4>

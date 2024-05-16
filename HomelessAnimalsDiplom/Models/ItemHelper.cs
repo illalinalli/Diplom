@@ -6,10 +6,10 @@
         public static double[,] BreedsSimilarity;
         public static double[,] ColorsSimilarity;
         public static double[,] SizesSimilarity;
-        public const int MAX_BREED_DIFFERENCE = 4;
-        public const int MAX_TREE_PROXIMITY = 5; // уровни
-        public static double MAX_COLOR_DIFFERENCE { get; } = 2;
-        public static double MAX_SIZE_DIFFERENCE { get; } = 2;
+        public const int MAX_BREED_DIFFERENCE = 16;
+        public const int MAX_TREE_PROXIMITY = 3; // уровни
+        public static double MAX_COLOR_DIFFERENCE { get; } = 6; // 2 0.5 0.5 07. 0.3 0.6
+        public static double MAX_SIZE_DIFFERENCE { get; } = 2; // 2
         static ItemHelper()
         {
             BreedsSimilarity = BreedSimilarity.ConvertToDoubleMatrix(BreedSimilarity.GetAllBreedsSimilarity(), Breed.GetAllBreeds());

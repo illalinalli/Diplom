@@ -13,6 +13,8 @@ namespace HomelessAnimalsDiplom.Models
         public bool IsCommonResult { get; set; }
         public bool IsColor { get; set; }
         public bool IsSize { get; set; }
+        public bool IsItemsSimilarityValue { get; set; }
+
 
         public static List<CoefficientAdjuster> GetAllCoefficients()
         {
