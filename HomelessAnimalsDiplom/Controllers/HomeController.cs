@@ -53,7 +53,6 @@ namespace HomelessAnimalsDiplom.Controllers
                 MainPageModel mainPageModel = new();
                 
                 var httpContext = HttpContext;
-                //var s = UserCollection?.Find(new BsonDocument()).ToList();
                 var user = UserCollection?.Find(x => x.Login == Login).FirstOrDefault();
                 mainPageModel.CurUser = user;
                 CurUser = user;

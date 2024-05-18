@@ -25,6 +25,67 @@ namespace HomelessAnimalsDiplom.Models
 
         [BsonIgnore]
         public static Dictionary<ObjectId, int> ColorsNums { get; set; } = new();
+
+        public static Item GetById(ObjectId id)
+        {
+            return GetAllItems().FirstOrDefault(x => x.Id == id);
+        }
+        public static List<Item> GetNewestItems()
+        {
+            List<Item> res = new();
+            var allItems = GetAllItems();
+
+            if (allItems.Count == 0) return res; // Если нет публикаций, возвращаем пустой список
+
+            // Находим максимальную дату создания
+            var maxCreationDate = allItems.Max(item => item.CreationDate);
+
+            // Добавляем все публикации с максимальной датой создания
+            res = allItems.Where(item => item.CreationDate == maxCreationDate).ToList();
+
+            return res;
+        }
+        public static List<Item> GetMostPopularItems()
+        {
+            List<Item> result = new();
+            var allItems = GetAllItems();
+            var allUsers = User.GetAllUsers();
+
+            Dictionary<ObjectId, int> itemLikes = new();
+
+            foreach (var user in allUsers)
+            {
+                foreach (var itemId in user.Favorites)
+                {
+                    if (itemLikes.ContainsKey(itemId))
+                    {
+                        itemLikes[itemId]++;
+                    }
+                    else
+                    {
+                        itemLikes[itemId] = 1;
+                    }
+                }
+            }
+
+            var sortedItems = itemLikes.OrderByDescending(x => x.Value).ToList();
+
+            int maxLikes = sortedItems[0].Value;
+
+            foreach (var item in sortedItems)
+            {
+                if (item.Value == maxLikes)
+                {
+                    result.Add(GetById(item.Key));
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return result;
+        }
         public bool HaveColor(PropertyValue propertyValue)
         {
             // this.Colors

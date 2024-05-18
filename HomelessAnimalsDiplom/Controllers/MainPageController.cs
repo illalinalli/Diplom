@@ -8,11 +8,6 @@ namespace HomelessAnimalsDiplom.Controllers
 {
     public class MainPageController : Controller
     {
-       
-        /*   public IActionResult AdvertisementView()
-           {
-               return View("AdvertisementView");
-           }*/
 
         [HttpPost]
         public IActionResult AdvertisementView(string curTitle)

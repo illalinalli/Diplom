@@ -277,3 +277,61 @@ td:first-child, th:first-child {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.card-login-form {
+    /*background-color: rgba(238, 220, 130, 0.6) !important;*/
+    color: #2b2d42 !important;
+    border-color: #2b2d42 !important;
+    align-items: center !important;
+    /*text-align: center !important;*/
+}
+
+.label-login {
+    color: #2b2d42 !important;
+    font-size: medium !important;
+}
+
+.input-form-login {
+    font-size: medium !important;
+    border-color: #2b2d42 !important;
+}
+.btn-ad-details {
+    width: 80% !important;
+    border-color: #2b2d42 !important;
+    font-size: 14px !important;
+}
+
+.btn-login {
+    width: 50% !important;
+    border-color: #2b2d42 !important;
+    font-size: 14px !important;
+    display: flex !important;
+    justify-content: center;
+    margin: 20px 250px 20px 300px;
+    height: 35px !important;
+    background-color: green !important;
+    font-weight: 500;
+    font-size: 15px !important;
+}
+
+.btn-login.btn-reg {
+    background-color: white !important;
+
+}
+
+.watched-item {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #3c4246a6;
+    opacity: 1;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    width: auto;
+}
+.watched-title {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+}

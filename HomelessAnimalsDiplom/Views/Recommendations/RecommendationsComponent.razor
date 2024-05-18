@@ -8,7 +8,9 @@
 @using static Models.ContentBasedFiltering;
 @code {
     public List<Item> Items = Item.GetAllItems();
-    public List<Item> RecommendationItems = new();
+    public List<Item> RecommendationItems;
+    public List<Item> MostPopularItems = new();
+    public List<Item> NewestItems = new();
     public static AdvertisementDetailComponent? AdvertisementDetail = new();
     public static MainPageSettings MainPage = new();
 
@@ -20,13 +22,15 @@
         if (CurUser == null || Items == null) return;
         if (CurUser.ViewingHistory == null) CurUser.ViewingHistory = new();
         var user = CurUser;
-        //recomSystem.breeds = BreedCollection.Find(new BsonDocument()).ToList();
         recomSystem.items = Items;
-        //recomSystem.users = UserCollection.Find(new BsonDocument()).ToList();
-        //recomSystem.properties_values = PropertyValueCollection.Find(new BsonDocument()).ToList();
-        RecommendationItems = recomSystem.Recommend();
-        //RecommendationItems = recomSystem.TreeProximityRecommend();
-       // RecommendationItems = recomSystem.EuclideanDistanceRecommend(); //recomSystem.TreeProximityRecommend();
+        //RecommendationItems = recomSystem.Recommend();
+        RecommendationItems = recomSystem.EuclideanDistanceRecommend();
+        //var b = recomSystem.TreeProximityRecommend();
+
+        MostPopularItems = Item.GetMostPopularItems().Where(x => !CurUser.Favorites.Any(y => y == x.Id)
+                           && !RecommendationItems.Any(item => item.Id == x.Id)).ToList();
+        NewestItems = Item.GetNewestItems().Where(x => !CurUser.Favorites.Any(y => y == x.Id)
+                        && !RecommendationItems.Any(item => item.Id == x.Id)).ToList();
     }
 
     public bool IsWatchedItem(Item item)
@@ -46,9 +50,49 @@
         AdvertisementDetail?.ShowDialog(item, null, null);
     }
 }
+@foreach (var popItem in MostPopularItems)
+{
+    <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
+        <div class="card card-item">
+            @if (popItem.Images?.Count != 0)
+            {
+                <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(popItem.Images.First())}")" alt="Image" class="d-block w-100 card-img">
+            }
+            <div class="watched-item" style="position: absolute;top: 10px;right: 10px;background-color: #3c4246a6;opacity: 1;color: white;padding: 5px;border-radius: 5px;width: auto;">
+                <span class="bi bi-fire watched-title" style=" font-size: 14px;font-weight: 400;letter-spacing: 0.03em;"> Популярно</span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title title-card-all">@popItem.Title</h5>
+                <div class="card-button-container">
+                    <button class="btn btn-outline-dark btn-ad-details" @onclick="()=>ShowDetails(popItem)">Подробнее...</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@foreach (var newItem in NewestItems)
+{
+    <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
+        <div class="card card-item">
+            @if (newItem.Images?.Count != 0)
+            {
+                <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(newItem.Images.First())}")" alt="Image" class="d-block w-100 card-img">
+            }
+            <div class="watched-item" style="position: absolute;top: 10px;right: 10px;background-color: #3c4246a6;opacity: 1;color: white;padding: 5px;border-radius: 5px;width: auto;">
+                <span class="watched-title" style="font-size: 14px;font-weight: 400;letter-spacing: 0.03em;">Новинка</span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title title-card-all">@newItem.Title</h5>
+                <div class="card-button-container">
+                    <button class="btn btn-outline-dark btn-ad-details" @onclick="()=>ShowDetails(newItem)">Подробнее...</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @if (RecommendationItems.Count() != 0)
 {
-    foreach (var item in RecommendationItems)
+    @foreach (var item in RecommendationItems)
     {
         <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6 col-12 pt-3 pb-5">
             <div class="card card-item" style="@(IsWatchedItem(item).StrIf("opacity: 0.65;"))">
@@ -58,14 +102,14 @@
                 }
                 @if (IsWatchedItem(item))
                 {
-                    <div style="position: absolute; top: 10px; right: 10px; background-color: #3c4246a6; opacity: 1; color: white; padding: 5px; border-radius: 5px; width: auto;">
-                        <span style="font-size: 14px; font-weight: 400; letter-spacing: 0.03em;">Просмотрено 👁</span>
+                    <div class="watched-item" style="position: absolute;top: 10px;right: 10px;background-color: #3c4246a6;opacity: 1;color: white;padding: 5px;border-radius: 5px;width: auto;">
+                        <span class="bi bi-eye watched-title" style=" font-size: 14px;font-weight: 400;letter-spacing: 0.03em;"> Просмотрено</span>
                     </div>
                 }
                 <div class="card-body">
                     <h5 class="card-title title-card-all">@item.Title</h5>
                     <div class="card-button-container">
-                        <button class="btn btn-outline-dark" style="width: 80%; border-color: #2b2d42; font-size: 14px;" @onclick="()=>ShowDetails(item)">Подробнее...</button>
+                        <button class="btn btn-outline-dark btn-ad-details" @onclick="()=>ShowDetails(item)">Подробнее...</button>
                     </div>
                 </div>
             </div>
@@ -73,9 +117,9 @@
         </div>
     }
 }
-else
+@*else
 {
     <h5 style="color: gray;">Предложений пока нет</h5>
-}
+}*@
 
                 

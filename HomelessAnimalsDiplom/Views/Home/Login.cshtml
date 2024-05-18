@@ -6,32 +6,31 @@
 }
 
 <div class="m-1 text-danger" asp-validation-summary="All"></div>
+<div class="row justify-content-center bordered card-login-form pt-4">
+    <div class="row mb-4">
+        <div class="col main-page-recom-title"style="text-align: center;">Вход</div>
+    </div>
+    <div class="col-12">
+        <form method="post">
+            <input type="hidden" name="returnUrl" />
+            <div class="form-group mb-3">
+                <label class="label-login">Имя пользователя</label>
+                <input class="form-control input-form-login" asp-for="@Model.Login" />
+            </div>
+            <div class="form-group">
+                <label class="label-login">Пароль</label>
+                <input class="form-control input-form-login" asp-for="@Model.Password" type="password" class="form-control" />
+            </div>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <form method="post">
-                <input type="hidden" name="returnUrl"/>
-                <div class="form-group mb-3">
-                    <label>Имя пользователя</label>
-                    <input class="form-control" asp-for="@Model.Login" />
-                </div>
-                <div class="form-group">
-                    <label>Пароль</label>
-                    <input asp-for="@Model.Password" type="password" class="form-control" />
-                </div>
-                
-                <a href="/Home/SignUp">Регистрация</a>
-                
-                <div class="form-group mt-3">
-                    <button class="btn btn-primary"
-                            type="submit">
-                        Войти
-                    </button>
-                </div>
-
-            </form>
-        </div>
+            <div class="form-group mt-3">
+                <button class="btn btn-primary btn-login"
+                        type="submit">
+                    Войти
+                </button>
+            </div>
+            
+            <a class="btn btn-outline btn-login btn-reg" href="/Home/SignUp">Регистрация</a>
+          
+        </form>
     </div>
 </div>
-

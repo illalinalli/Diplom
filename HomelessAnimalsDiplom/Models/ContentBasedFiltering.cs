@@ -80,7 +80,6 @@ namespace HomelessAnimalsDiplom.Models
             {
                 for (var j = 0; j < similarityMatrix.GetLength(1); j++)
                 {
-                    var pairs = BuildValuePairs(favoriteItems[i], items[j]);
                     var parentsItem1 = GetParentsFromNode(node, favoriteItems[i]);
                     var parentsItem2 = GetParentsFromNode(node, items[j]);
                     double treeProximity = SimilarityMeasureCalculator.CalcTreeProximity(parentsItem1.ToArray(), parentsItem2.ToArray(), favoriteItems[i], items[j]);
@@ -156,14 +155,8 @@ namespace HomelessAnimalsDiplom.Models
                 for (var j = 0; j < similarityMatrix.GetLength(1); j++)
                 {
                     var pairs = BuildValuePairs(favoriteItems[i], items[j]);
-
-                    var euclideanDistance = SimilarityMeasureCalculator.CalcEuclideanDistance(pairs); // для построения дерева близостей
-
-                    //double treeProximity = SimilarityMeasureCalculator.CalcTreeProximity(
-                            //favoriteItems[i].Parents, items[j].Parents);
-
-                    // Используем евклидово расстояние (составляет 70% в итоговом значении)
-                    // и близость по дереву (30%) для получения итогового сходства пород.
+                    var euclideanDistance = SimilarityMeasureCalculator.CalcEuclideanDistance(pairs);
+                    // Используем евклидово расстояние
                     similarityMatrix[i, j] = 1 - euclideanDistance; // + (1 - treeProximity / ItemHelper.MAX_TREE_PROXIMITY) * 0.3
                 }
             }
@@ -270,7 +263,7 @@ namespace HomelessAnimalsDiplom.Models
                 .Where(itemSimilarity => itemSimilarity.Value > itemsSimilarityCoeff)
                 .OrderByDescending(itemSimilarity =>
                     itemSimilarity.Value)
-                .Select(itemSimilarity => itemSimilarity.Key).Take(5);
+                .Select(itemSimilarity => itemSimilarity.Key);
             List<Item> res = new();
             foreach (var recId in recommendedIds)
             {
@@ -278,7 +271,7 @@ namespace HomelessAnimalsDiplom.Models
                 if (item == null) continue;
                 res.Add(item);
             }
-            
+
             return res;
         }
 
@@ -293,18 +286,8 @@ namespace HomelessAnimalsDiplom.Models
             List<int> colorsNum1 = new();
             List<int> colorsNum2 = new();
 
-            foreach (var c1 in item1.Colors)
-            {
-                colorsNum1.Add(c1.GetColorNumber());
-            }
-            
-            foreach (var c2 in item2.Colors)
-            {
-                colorsNum2.Add(c2.GetColorNumber());
-            }
-
-            var a = item1.GetSizeNum(item1.GetBreed());
-            var b = item2.GetSizeNum(item2.GetBreed());
+            item1.Colors.ForEach(c1 => colorsNum1.Add(c1.GetColorNumber()));
+            item2.Colors.ForEach(c2 => colorsNum2.Add(c2.GetColorNumber()));
 
             return new[]
             {

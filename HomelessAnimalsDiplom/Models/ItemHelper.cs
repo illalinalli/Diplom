@@ -2,7 +2,6 @@
 {
     public static class ItemHelper
     {
-        //public static readonly Period[] Periods;
         public static double[,] BreedsSimilarity;
         public static double[,] ColorsSimilarity;
         public static double[,] SizesSimilarity;
@@ -18,7 +17,43 @@
         }
         public static double GetSizesSimilarity(int size1, int size2)
         {
-            return SizesSimilarity[size1, size2];
+            double similarity = 0;
+
+            // Создаём и заполняем матрицу схожести размеров
+            // (строки - размеры первого элемента, столбцы - второго).
+            var similarityMatrix = new double[1, 1];
+            var commonSizes = new List<int[]>();
+
+            similarityMatrix[0, 0] = SizesSimilarity[size1, size2];
+            // Суммируем общее значение схожести.
+            similarity += similarityMatrix[0, 0];
+
+            // Сохраняем координаты общих размеров (схожесть = 1).
+            if (Math.Abs(similarityMatrix[0, 0] - 1) < 0.01)
+            {
+                commonSizes.Add(new[] { 0, 0 });
+            }
+
+            // Дополняем до 1 те значения схожести, которые стоят
+            // на пересечении строк и столбцов общих размеров,
+            // увеличивая таким образом общую схожесть.
+            // То есть в таблице схожести должно быть
+            // (commonSizes.Count * commonSizes.Count) единиц.
+            for (var i = 0; i < commonSizes.Count; i++)
+            {
+                for (var j = 0; j < commonSizes.Count; j++)
+                {
+                    if (i != j)
+                    {
+                        similarity += 1 - similarityMatrix[commonSizes[i][0], commonSizes[j][1]];
+                    }
+                }
+            }
+
+            // Получаем схожесть списков размеров как среднее арифметическое всех ячеек.
+            similarity /= 1 * 1;
+            return similarity;
+            //return SizesSimilarity[size1, size2];
         }
         public static double GetColorsSimilarity(int[] colors1, int[] colors2)
         {
@@ -116,5 +151,7 @@
 
             return similarity;
         }
+
+
     }
 }

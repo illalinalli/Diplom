@@ -5,20 +5,18 @@
 @using MongoDB.Bson;
 @using MongoDB.Driver;
 @code {
-    //public Similarity similarity;  // Создание экземпляра матрицы
     AnimalType selectedAnimalType;
     private KeyValuePair<Breed, double> innerKvp;
     public List<BreedSimilarity> breedsSimilarity = new();
     List<AnimalType> AnimalTypes = new();
-    string newBreedName = String.Empty;
     PropertyValue selectedSize;
     Breed newBreed = new();
     List<Breed> breeds = new();
-
     PropertyValue newColor = new();
     List<ColorSimilarity> colorsSimilarity = new();
     List<SizeSimilarity> sizesSimilarity = new();
     List<CoefficientAdjuster> Coefficients = new();
+
     protected override void OnInitialized()
     {
         var allBreeds = Item.GetAllBreeds();

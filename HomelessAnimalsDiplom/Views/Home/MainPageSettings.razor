@@ -11,17 +11,17 @@
 @using MongoDB.Bson;
 @using MongoDB.Driver;
 @code {
-    
-    List<AnimalType> animalTypes = AnimalTypeCollection.Find(new BsonDocument()).ToList();
+
+    List<AnimalType> animalTypes = new();
     public SearchComponent? Search;
-    
+
     public static RecommendationsComponent? RecommendationsComp = new();
     public static MainPageSettings MainPage = new();
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-       
+        animalTypes = AnimalType.GetAnimalTypes();
     }
    
 }
